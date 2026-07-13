@@ -16,11 +16,13 @@ window.ontouchend = () => {
     starter?.remove()
     Game(document.querySelector<HTMLDivElement>("#game"), true)
     window.ontouchend = null
+    window.onmouseup = null
 }
 
 window.onmouseup = () => {
     starter?.remove()
     Game(document.querySelector<HTMLDivElement>("#game"), false)
+    window.ontouchend = null
     window.onmouseup = null
 }
 
