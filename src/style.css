@@ -1,0 +1,60 @@
+* {
+    margin: 0;
+    padding: 0;
+    size: border-box;
+}
+
+#app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#game {
+    padding-top: 100px;
+    text-align: center;
+}
+
+#play {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 10px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#flying {
+    flex: 1;
+}
+
+#chidiya {
+    align-self: center;
+    vertical-align: middle;
+    height: 250px;
+    width: 250px;
+    background-color: #f0f0f0;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#chidiya:active {
+    background-color: #ffffff;
+}
+
+#scoreboard {
+    margin-top: 100px;
+}
+
+#scoreboard ol li {
+    display: list-item;
+}
+
+.scores-header {
+    font-weight: 700;
+}
+
+.score-value {
+    font-weight: 600;
+}
