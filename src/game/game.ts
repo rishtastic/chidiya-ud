@@ -71,6 +71,7 @@ function PlayGame(game: HTMLDivElement, playerName: string, isTouchScreen: boole
 
     const end = () => {
         flying.innerText = btnText
+        btn.innerText = 'Click Here'
         saveScore(score, playerName)
         score = 0
         updateScore(scoring, score)
@@ -91,6 +92,7 @@ function PlayGame(game: HTMLDivElement, playerName: string, isTouchScreen: boole
     }
     
     const down = () => {
+        btn.innerText = ''
         nextObject(flying, currObj)
         timer = setTimeout(gameloop, resTime)
     }
