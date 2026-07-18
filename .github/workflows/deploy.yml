@@ -2,7 +2,7 @@ name: Deploy static content to Pages
 
 on:
   push:
-    branches: ["master"] # Change to "master" if your branch is named master
+    branches: ["master"]
 
 permissions:
   contents: read
@@ -26,9 +26,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: 'yarn' # 1. FIX: Changed from 'npm' to 'yarn'
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile # 2. FIX: Ensures clean install from lockfile
       - name: Build
         run: yarn build
       - name: Upload artifact
