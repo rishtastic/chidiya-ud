@@ -91,13 +91,17 @@ function PlayGame(game: HTMLDivElement, playerName: string, isTouchScreen: boole
         timer = setTimeout(gameloop, resTime)
     }
     
-    const down = () => {
+    const down = (ev: Event) => {
+        ev.stopImmediatePropagation()
+        ev.stopPropagation()
         btn.innerText = ''
         nextObject(flying, currObj)
         timer = setTimeout(gameloop, resTime)
     }
     
-    const up = () => {
+    const up = (ev: Event) => {
+        ev.stopImmediatePropagation()
+        ev.stopPropagation()
         clearTimeout(timer)
         if (!currObj.canFly) {
             alert(`${currObj.name} cannot fly`)
