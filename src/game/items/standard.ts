@@ -1,4 +1,4 @@
-import { type Candidate } from "./types.d"
+import { type Candidate } from "../types"
 
 const objects: Candidate[] = [
     { name: "chidiya", spoken: "चिड़िया", canFly: true },

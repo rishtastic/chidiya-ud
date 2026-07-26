@@ -1,4 +1,4 @@
-import objects from "./objects"
+import objects from "./items/standard"
 import type { Candidate, HighScore } from "./types"
 import { selectRandom, bolo } from "./utils"
 
