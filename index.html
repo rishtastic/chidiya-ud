@@ -2,12 +2,87 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" href="%BASE_URL%favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chidiya Ud</title>
+    <meta name="theme-color" content="#e7efe4" />
+    <meta name="description" content="Play Chidiya Ud online, a Hindi flying-or-not-flying reaction game for families and friends." />
+    <link rel="canonical" href="https://rishtastic.github.io/chidiya-ud/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Chidiya Ud Game Online" />
+    <meta property="og:description" content="Watch or listen, place your finger on the table, and lift it when it can fly." />
+    <meta property="og:url" content="https://rishtastic.github.io/chidiya-ud/" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Atma:wght@500;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": ["VideoGame", "WebApplication"],
+        "name": "Chidiya Ud",
+        "description": "A Hindi flying-or-not-flying reaction game for families and friends.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any",
+        "url": "https://rishtastic.github.io/chidiya-ud/",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
+    <title>Chidiya Ud Game Online | Flying or Not Flying</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <main class="site-shell">
+        <!-- Edit the page copy in this block. The game reuses it after each round. -->
+        <section id="game" class="game-stage" data-state="ready" aria-labelledby="game-title">
+          <div id="game-content">
+            <div class="ready-content">
+              <div class="title-lockup">
+                <h1 id="game-title">Chidiya Ud</h1>
+                <p>Watch or listen carefully. Place your finger on the table, then lift it only when it can fly.</p>
+              </div>
+              <section class="game-intro" aria-labelledby="about-game-title">
+                <h2 id="about-game-title">What is Chidiya Ud?</h2>
+                <p>Chidiya Ud is a traditional Indian group reaction game. A caller names things, and players react only when the thing can fly.</p>
+              </section>
+              <form id="player-form" class="player-form" action="#game" method="get" novalidate>
+                <label for="player">Your name</label>
+                <input id="player" name="player" maxlength="24" autocomplete="name" placeholder="Enter your name" required />
+                <p id="name-error" class="field-error" role="alert"></p>
+                <button type="submit" class="start-button">Start game</button>
+                <button id="controls-trigger" class="controls-button" type="button" aria-haspopup="dialog" aria-controls="controls-dialog">Controls</button>
+              </form>
+            </div>
+          </div>
+        </section>
+        <section id="scoreboard" class="scoreboard" aria-labelledby="scores-title">
+          <h2 id="scores-title">High scores</h2>
+          <p class="scores-empty">Play a round to add your score.</p>
+        </section>
+        <section class="how-to-play" aria-labelledby="how-to-play-title">
+          <div class="how-to-play-inner">
+            <h2 id="how-to-play-title">How to play</h2>
+            <p>Enter your name <span aria-hidden="true">&middot;</span> Watch or listen <span aria-hidden="true">&middot;</span> Place your finger <span aria-hidden="true">&middot;</span> Lift if it can fly</p>
+          </div>
+        </section>
+        <section class="game-story" aria-labelledby="game-story-title">
+          <h2 id="game-story-title">About Chidiya Ud</h2>
+          <p>Chidiya Ud is a traditional Indian listening and reaction game, usually played in a group. One person leads the round, naming birds, animals, objects, and anything else they can think of.</p>
+          <h3>Traditional group rules</h3>
+          <p>Players react when they hear something that can fly and stay still for everything else. The fun is in listening closely instead of following along too quickly.</p>
+          <h3>How this version works</h3>
+          <p>Place your finger on the table to begin. Keep holding for things that cannot fly, and lift your finger as soon as a flying thing is called.</p>
+        </section>
+      </main>
+      <dialog id="controls-dialog" class="controls-dialog" aria-labelledby="controls-title">
+        <div class="controls-dialog-content">
+          <h2 id="controls-title">Controls</h2>
+          <p><strong>Touch or mouse:</strong> Place and keep your finger on the table. Lift it when the item can fly.</p>
+          <p><strong>Keyboard:</strong> Keep Space or Enter pressed. Release the key when the item can fly.</p>
+          <p><strong>Play by sight or sound:</strong> Each item appears on screen and is also spoken aloud.</p>
+          <button id="controls-close" class="text-button" type="button">Close</button>
+        </div>
+      </dialog>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

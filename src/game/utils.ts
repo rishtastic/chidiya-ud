@@ -4,6 +4,7 @@ export function selectRandom<Type>(arr: Type[]): Type {
 }
 
 export function bolo(term: string) {
+    speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(term);
     utterance.lang = "hi-IN";
     speechSynthesis.speak(utterance);

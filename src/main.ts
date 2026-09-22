@@ -1,28 +1,22 @@
 import './style.css'
 import Game from './game/game.ts'
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-<div id="game">
-    <div id="starter">Click anywhere to begin</div>
-    <div id="playerInput"></div>
-    <div id="play"></div>
-    <div id="scoreboard"></div>
-</div>
-`
+Game(document.querySelector<HTMLDivElement>('#game'))
 
-const starter = document.getElementById("starter")
+const controlsDialog = document.querySelector<HTMLDialogElement>('#controls-dialog')
 
-window.ontouchend = () => {
-    starter?.remove()
-    Game(document.querySelector<HTMLDivElement>("#game"), true)
-    window.ontouchend = null
-    window.onmouseup = null
-}
+document.addEventListener('click', (event) => {
+    const target = event.target
+    if (!(target instanceof Element) || !controlsDialog) {
+        return
+    }
 
-window.onmouseup = () => {
-    starter?.remove()
-    Game(document.querySelector<HTMLDivElement>("#game"), false)
-    window.ontouchend = null
-    window.onmouseup = null
-}
+    if (target.closest('#controls-trigger')) {
+        controlsDialog.showModal()
+        return
+    }
 
+    if (target.closest('#controls-close') || target === controlsDialog) {
+        controlsDialog.close()
+    }
+})

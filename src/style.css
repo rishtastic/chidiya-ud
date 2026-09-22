@@ -1,60 +1,594 @@
+:root {
+    color: #243247;
+    background: #e7efe4;
+    font-family: "Nunito Sans", Avenir, Helvetica, Arial, sans-serif;
+    font-synthesis: none;
+}
+
 * {
+    box-sizing: border-box;
+}
+
+body {
+    min-width: 320px;
     margin: 0;
-    padding: 0;
-    size: border-box;
+    background: #e7efe4;
 }
 
-#app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+button,
+input {
+    font: inherit;
 }
 
-#game {
-    padding-top: 100px;
-    text-align: center;
-}
-
-#play {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    gap: 10px;
-    text-align: center;
-    vertical-align: middle;
-}
-
-#flying {
-    flex: 1;
-}
-
-#chidiya {
-    align-self: center;
-    vertical-align: middle;
-    height: 250px;
-    width: 250px;
-    background-color: #f0f0f0;
-    border: none;
-    font-size: 16px;
+button {
     cursor: pointer;
 }
 
-#chidiya:active {
-    background-color: #ffffff;
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid #d6a12a;
+    outline-offset: 4px;
 }
 
-#scoreboard {
-    margin-top: 100px;
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
-#scoreboard ol li {
-    display: list-item;
+.site-shell {
+    min-height: 100vh;
+    overflow: hidden;
 }
 
-.scores-header {
+.game-stage {
+    position: relative;
+    display: grid;
+    min-height: 620px;
+    padding: 2.5rem 1.5rem 3.5rem;
+    place-items: center;
+    text-align: center;
+}
+
+.mascot {
+    position: absolute;
+    z-index: 1;
+    top: 2rem;
+    width: 5.5rem;
+    height: 5.5rem;
+    mix-blend-mode: multiply;
+    object-fit: contain;
+}
+
+#game-content {
+    position: relative;
+    z-index: 2;
+    width: min(100%, 48rem);
+}
+
+.ready-content {
+    display: grid;
+    gap: 1.6rem;
+    justify-items: center;
+    padding-top: 5rem;
+}
+
+.title-lockup h1,
+.game-prompt,
+.result-score strong,
+.scoreboard h2,
+.how-to-play h2,
+.game-story h2 {
+    margin: 0;
+    font-family: Atma, "Nunito Sans", sans-serif;
     font-weight: 700;
 }
 
-.score-value {
-    font-weight: 600;
+.title-lockup h1 {
+    color: #243b67;
+    font-size: clamp(3.25rem, 7vw, 5.5rem);
+    line-height: 0.92;
+    text-transform: uppercase;
+}
+
+.title-lockup p {
+    margin: 1rem 0 0;
+    color: #243247;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.game-intro {
+    width: min(100%, 34rem);
+    color: #243247;
+}
+
+.game-intro h2 {
+    margin: 0 0 0.25rem;
+    color: #243b67;
+    font-family: Atma, "Nunito Sans", sans-serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.game-intro p {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.player-form {
+    display: grid;
+    width: min(100%, 32rem);
+    gap: 0.7rem;
+    text-align: left;
+}
+
+.player-form label,
+.game-status,
+.scoreboard h2,
+.how-to-play h2 {
+    color: #243b67;
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.player-form input {
+    width: 100%;
+    min-height: 3.8rem;
+    border: 3px solid #243b67;
+    border-radius: 0.7rem;
+    background: #fff9ed;
+    color: #243247;
+    font-size: 1.15rem;
+    padding: 0.75rem 1rem;
+}
+
+.player-form input::placeholder {
+    color: #647080;
+}
+
+.field-error {
+    min-height: 1.25rem;
+    margin: 0;
+    color: #a53d2b;
+    font-weight: 700;
+}
+
+.controls-button {
+    justify-self: center;
+    border: 0;
+    background: transparent;
+    color: #243b67;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+}
+
+.start-button {
+    min-height: 4rem;
+    border: 3px solid #243b67;
+    border-radius: 0.75rem;
+    background: #b9553b;
+    box-shadow: 0 5px 0 #243b67;
+    color: #fff9ed;
+    font-size: 1.18rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.start-button:active {
+    box-shadow: 0 1px 0 #243b67;
+    transform: translateY(4px);
+}
+
+.play-content {
+    display: grid;
+    justify-items: center;
+    padding-top: 2.5rem;
+}
+
+.game-status {
+    display: flex;
+    width: min(100%, 60rem);
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.game-status p {
+    margin: 0;
+}
+
+.game-status strong {
+    color: #243247;
+    font-size: 1.15rem;
+    letter-spacing: 0;
+}
+
+.prompt-wrap {
+    display: grid;
+    min-height: 10rem;
+    align-content: center;
+    gap: 0.35rem;
+}
+
+.game-prompt {
+    max-width: min(100%, 44rem);
+    overflow-wrap: anywhere;
+    color: #243b67;
+    font-size: clamp(2.75rem, 8vw, 6.5rem);
+    line-height: 0.96;
+    text-transform: uppercase;
+}
+
+.game-prompt-guidance {
+    max-width: 32rem;
+    font-family: "Nunito Sans", Avenir, Helvetica, Arial, sans-serif;
+    font-size: clamp(1.7rem, 4vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.12;
+    text-transform: none;
+}
+
+.prompt-helper,
+.table-helper {
+    margin: 0;
+    color: #243247;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.table-control {
+    position: relative;
+    display: block;
+    width: min(100%, 22rem);
+    height: 10.5rem;
+    margin-top: 0.5rem;
+    border: 0;
+    background: transparent;
+    touch-action: none;
+    user-select: none;
+}
+
+.tabletop {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    display: grid;
+    width: 100%;
+    height: 6.4rem;
+    border: 3px solid #243b67;
+    border-radius: 48% 48% 36% 36% / 54% 54% 24% 24%;
+    background: #b9553b;
+    box-shadow: inset 0 -0.8rem 0 #91432e;
+    color: #fff9ed;
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    place-items: center;
+    text-transform: uppercase;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.table-leg {
+    position: absolute;
+    z-index: 1;
+    top: 5.6rem;
+    width: 2.2rem;
+    height: 4.4rem;
+    border: 3px solid #243b67;
+    background: #91432e;
+    transform-origin: top;
+    transition: transform 120ms ease;
+}
+
+.table-leg-left {
+    left: 1.3rem;
+    transform: skewX(-9deg);
+}
+
+.table-leg-right {
+    right: 1.3rem;
+    transform: skewX(9deg);
+}
+
+.table-control.is-held .tabletop {
+    box-shadow: inset 0 -0.35rem 0 #91432e;
+    transform: translateY(5px);
+}
+
+.table-control.is-held .table-leg-left {
+    transform: translateY(5px) skewX(-9deg);
+}
+
+.table-control.is-held .table-leg-right {
+    transform: translateY(5px) skewX(9deg);
+}
+
+.table-helper {
+    margin-top: -0.45rem;
+}
+
+.result-content {
+    display: grid;
+    min-height: 22rem;
+    align-content: center;
+    justify-items: center;
+    gap: 1rem;
+    padding-top: 3rem;
+}
+
+.result-message {
+    max-width: 36rem;
+    margin: 0;
+    color: #a53d2b;
+    font-size: clamp(1.7rem, 4vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.result-score {
+    margin: 0;
+    color: #243247;
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.result-score strong {
+    color: #52734d;
+    font-size: 2.7rem;
+    vertical-align: middle;
+}
+
+.result-actions {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+    margin-top: 1rem;
+}
+
+.text-button {
+    border: 0;
+    background: transparent;
+    color: #243b67;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+}
+
+.controls-dialog {
+    width: min(calc(100% - 2rem), 32rem);
+    border: 3px solid #243b67;
+    border-radius: 0.5rem;
+    background: #fff9ed;
+    box-shadow: 0 6px 0 #243b67;
+    color: #243247;
+}
+
+.controls-dialog::backdrop {
+    background: rgb(36 59 103 / 38%);
+}
+
+.controls-dialog-content {
+    padding: 1.5rem;
+}
+
+.controls-dialog h2 {
+    margin: 0 0 1rem;
+    color: #243b67;
+    font-family: Atma, "Nunito Sans", sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.controls-dialog p {
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+.scoreboard {
+    width: min(100% - 3rem, 44rem);
+    margin: 0 auto;
+    padding: 2.6rem 0 3rem;
+    text-align: center;
+}
+
+.scoreboard h2 {
+    margin: 0 0 1.15rem;
+    font-size: 1.15rem;
+}
+
+.scores-empty {
+    margin: 0;
+    color: #516173;
+    font-weight: 700;
+}
+
+.scores-list {
+    display: grid;
+    gap: 0.55rem;
+    max-width: 28rem;
+    margin: 0 auto;
+    padding: 0;
+    list-style-position: inside;
+    text-align: left;
+}
+
+.scores-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    padding-left: 0.35rem;
+    color: #243247;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.scores-list span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.scores-list strong {
+    color: #52734d;
+}
+
+.how-to-play {
+    border-top: 3px solid #52734d;
+    background: #fff9ed;
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+.how-to-play-inner {
+    width: min(100%, 52rem);
+    margin: 0 auto;
+}
+
+.how-to-play h2,
+.game-story h2 {
+    margin-bottom: 0.55rem;
+    font-size: 1.15rem;
+}
+
+.how-to-play p,
+.game-story p {
+    margin: 0;
+    color: #243247;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.game-story p + h3 {
+    margin-top: 1.5rem;
+}
+
+.game-story h3 {
+    margin-bottom: 0.45rem;
+    color: #243b67;
+    font-family: Atma, "Nunito Sans", sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.how-to-play span {
+    color: #d6a12a;
+    padding: 0 0.35rem;
+}
+
+.game-story {
+    width: min(100% - 3rem, 44rem);
+    margin: 0 auto;
+    padding: 2.5rem 0 3.5rem;
+    text-align: center;
+}
+
+.game-story h2 {
+    color: #243b67;
+}
+
+@media (min-width: 760px) {
+    .game-stage[data-state="playing"] .mascot,
+    .game-stage[data-state="result"] .mascot {
+        top: 11rem;
+        left: max(3rem, 13vw);
+        width: 7rem;
+        height: 7rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .game-stage {
+        min-height: 0;
+        padding: 1.25rem 1.25rem 2.25rem;
+    }
+
+    .mascot {
+        top: 1rem;
+        width: 4.25rem;
+        height: 4.25rem;
+    }
+
+    .ready-content {
+        gap: 1.15rem;
+        padding-top: 4.15rem;
+    }
+
+    .title-lockup p {
+        font-size: 1rem;
+    }
+
+    .game-intro h2 {
+        font-size: 1.35rem;
+    }
+
+    .game-intro p {
+        font-size: 0.92rem;
+        line-height: 1.35;
+    }
+
+    .game-status {
+        margin-bottom: 1.8rem;
+        font-size: 0.78rem;
+    }
+
+    .game-status strong {
+        display: block;
+        margin-top: 0.2rem;
+        font-size: 1rem;
+    }
+
+    .prompt-wrap {
+        min-height: 8rem;
+    }
+
+    .table-control {
+        width: min(100%, 17rem);
+        height: 9rem;
+    }
+
+    .tabletop {
+        height: 5.45rem;
+        font-size: 1.25rem;
+    }
+
+    .table-leg {
+        top: 4.75rem;
+        width: 1.85rem;
+        height: 3.8rem;
+    }
+
+    .table-helper,
+    .prompt-helper {
+        font-size: 0.98rem;
+    }
+
+    .scoreboard {
+        width: min(100% - 2.5rem, 44rem);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
 }
