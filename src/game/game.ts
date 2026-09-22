@@ -4,7 +4,7 @@ import { bolo, selectRandom } from './utils'
 
 const initialResponseTime = 2000
 const minimumResponseTime = 1000
-const responseTimeStep = 100
+const responseTimeStep = 50
 const scoreStorageKey = 'scores'
 const nameLimit = 24
 
