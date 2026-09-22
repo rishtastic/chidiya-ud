@@ -2,7 +2,9 @@ import objects from './items/standard'
 import type { Candidate, HighScore } from './types'
 import { bolo, selectRandom } from './utils'
 
-const responseTime = 2000
+const initialResponseTime = 2000
+const minimumResponseTime = 1000
+const responseTimeStep = 100
 const scoreStorageKey = 'scores'
 const nameLimit = 24
 
@@ -145,6 +147,11 @@ function Game(game: HTMLDivElement | null) {
         }
     }
 
+    const currentResponseTime = () => Math.max(
+        minimumResponseTime,
+        initialResponseTime - score * responseTimeStep,
+    )
+
     const updatePrompt = (text: string, isGuidance = false) => {
         const prompt = content.querySelector<HTMLElement>('#game-prompt')
         if (!prompt) {
@@ -230,7 +237,7 @@ function Game(game: HTMLDivElement | null) {
         awardPoint()
         currentObject = selectRandom(objects)
         showCurrentObject()
-        timer = setTimeout(resolveHold, responseTime)
+        timer = setTimeout(resolveHold, currentResponseTime())
     }
 
     const startHold = () => {
@@ -240,7 +247,7 @@ function Game(game: HTMLDivElement | null) {
         holding = true
         setHoldingAppearance(true)
         showCurrentObject()
-        timer = setTimeout(resolveHold, responseTime)
+        timer = setTimeout(resolveHold, currentResponseTime())
     }
 
     const releaseHold = () => {
