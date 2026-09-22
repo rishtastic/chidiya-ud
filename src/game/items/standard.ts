@@ -1,4 +1,4 @@
-import { type Candidate } from "./types.d"
+import type { Candidate } from "../types"
 
 const objects: Candidate[] = [
     { name: "chidiya", spoken: "चिड़िया", canFly: true },
@@ -205,7 +205,7 @@ const objects: Candidate[] = [
     { name: "book", spoken: "बुक", canFly: false },
     { name: "pencil", spoken: "पेंसिल", canFly: false },
     { name: "bottle", spoken: "बॉटल", canFly: false },
-    { name: "umbrella", spoken: "अम्ब्रेला", canFly: false },
+    { name: "umbrella", spoken: "अम्ब्रेला", canFly: true },
 
     { name: "witch", spoken: "विच", canFly: true },
     { name: "ghost", spoken: "घोस्ट", canFly: true },
