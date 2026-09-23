@@ -1,7 +1,10 @@
 import './style.css'
 import Game from './game/game.ts'
+import GlobalLeaderboard from './game/global-leaderboard.ts'
 
-Game(document.querySelector<HTMLDivElement>('#game'))
+const globalLeaderboard = new GlobalLeaderboard(document.querySelector<HTMLElement>('#global-scoreboard'))
+Game(document.querySelector<HTMLDivElement>('#game'), globalLeaderboard)
+void globalLeaderboard.refresh()
 
 const controlsDialog = document.querySelector<HTMLDialogElement>('#controls-dialog')
 

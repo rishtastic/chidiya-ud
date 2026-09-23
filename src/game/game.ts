@@ -1,25 +1,26 @@
 import objects from './items/standard'
-import type { Candidate, HighScore } from './types'
+import GlobalLeaderboard, { type ScoreSubmission } from './global-leaderboard'
+import type { Candidate } from './types'
 import { bolo, selectRandom } from './utils'
 
 const initialResponseTime = 2000
 const minimumResponseTime = 1000
 const responseTimeStep = 50
-const scoreStorageKey = 'scores'
 const nameLimit = 24
+const minimumRankLoadingMs = 1800
 
 type ScreenState = 'ready' | 'playing' | 'result'
 type EndReason = 'released-too-early' | 'held-too-long'
+type DisplayRankRow = { rank: number, score: number, player: string, isPlayer?: boolean }
 
-function Game(game: HTMLDivElement | null) {
+function Game(game: HTMLDivElement | null, globalLeaderboard?: GlobalLeaderboard) {
     if (!game) {
         console.error('Game not initialised')
         return
     }
 
     const content = game.querySelector<HTMLDivElement>('#game-content')
-    const scoreboard = document.querySelector<HTMLElement>('#scoreboard')
-    if (!content || !scoreboard) {
+    if (!content) {
         console.error('Game elements not initialised')
         return
     }
@@ -33,6 +34,9 @@ function Game(game: HTMLDivElement | null) {
     let timer: ReturnType<typeof setTimeout> | undefined
     let holding = false
     let activePointerId: number | null = null
+    let roundStartedAt = 0
+    let rankLoaderStartedAt = 0
+    let leaderboardSession: Promise<string | null> | undefined
 
     const escapeHtml = (value: string) => value
         .replaceAll('&', '&amp;')
@@ -46,65 +50,6 @@ function Game(game: HTMLDivElement | null) {
             clearTimeout(timer)
             timer = undefined
         }
-    }
-
-    const getScores = (): HighScore[] => {
-        try {
-            const stored = JSON.parse(localStorage.getItem(scoreStorageKey) ?? '[]')
-            if (!Array.isArray(stored)) {
-                return []
-            }
-            return stored.filter((entry): entry is HighScore => (
-                typeof entry?.player === 'string'
-                && typeof entry?.score === 'number'
-                && typeof entry?.time === 'number'
-                && entry.player.trim() !== ''
-                && entry.score > 0
-            ))
-        } catch {
-            return []
-        }
-    }
-
-    const saveScore = () => {
-        if (score <= 0) {
-            return
-        }
-        const nextScores = [...getScores(), { player: playerName, score, time: Date.now() }]
-            .sort((left, right) => right.score - left.score || left.time - right.time)
-            .slice(0, 10)
-        localStorage.setItem(scoreStorageKey, JSON.stringify(nextScores))
-    }
-
-    const renderScores = () => {
-        const scores = getScores()
-        scoreboard.replaceChildren()
-
-        const title = document.createElement('h2')
-        title.id = 'scores-title'
-        title.textContent = 'High scores'
-        scoreboard.append(title)
-
-        if (scores.length === 0) {
-            const empty = document.createElement('p')
-            empty.className = 'scores-empty'
-            empty.textContent = 'No scores yet. Be the first to play.'
-            scoreboard.append(empty)
-            return
-        }
-
-        const list = document.createElement('ol')
-        list.className = 'scores-list'
-        scores.forEach((highScore) => {
-            const item = document.createElement('li')
-            const player = document.createElement('span')
-            const value = document.createElement('strong')
-            player.textContent = highScore.player
-            value.textContent = String(highScore.score)
-            item.append(player, value)
-            list.append(item)
-        })
-        scoreboard.append(list)
     }
 
     const renderReady = () => {
@@ -132,6 +77,7 @@ function Game(game: HTMLDivElement | null) {
             playerName = name
             score = 0
             currentObject = selectRandom(objects)
+            startLeaderboardRound()
             renderPlaying('Place your finger on the table to begin')
         })
 
@@ -152,6 +98,10 @@ function Game(game: HTMLDivElement | null) {
         initialResponseTime - score * responseTimeStep,
     )
 
+    const currentSpeechRate = () => 1 + (
+        (initialResponseTime - currentResponseTime()) / (initialResponseTime - minimumResponseTime)
+    ) * 0.75
+
     const updatePrompt = (text: string, isGuidance = false) => {
         const prompt = content.querySelector<HTMLElement>('#game-prompt')
         if (!prompt) {
@@ -159,6 +109,32 @@ function Game(game: HTMLDivElement | null) {
         }
         prompt.textContent = text
         prompt.classList.toggle('game-prompt-guidance', isGuidance)
+        prompt.style.fontSize = ''
+
+        if (!isGuidance) {
+            requestAnimationFrame(() => fitPromptToWords(prompt, text))
+        }
+    }
+
+    const fitPromptToWords = (prompt: HTMLElement, text: string) => {
+        const longestWord = text.split(/\s+/).reduce((longest, word) => word.length > longest.length ? word : longest, '')
+        const availableWidth = prompt.parentElement?.clientWidth ?? prompt.clientWidth
+        if (!longestWord || availableWidth === 0) {
+            return
+        }
+
+        const style = getComputedStyle(prompt)
+        const canvas = document.createElement('canvas')
+        const context = canvas.getContext('2d')
+        if (!context) {
+            return
+        }
+        context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
+        const wordWidth = context.measureText(longestWord).width
+        if (wordWidth > availableWidth) {
+            const fontSize = Math.max(24, Math.floor(Number.parseFloat(style.fontSize) * ((availableWidth - 8) / wordWidth)))
+            prompt.style.fontSize = `${fontSize}px`
+        }
     }
 
     const announce = (text: string) => {
@@ -184,12 +160,178 @@ function Game(game: HTMLDivElement | null) {
     const showCurrentObject = () => {
         updatePrompt(currentObject.name)
         announce(`${currentObject.name}. Lift if it can fly. Score ${score}.`)
-        bolo(`${currentObject.spoken} उड़`)
+        bolo(`${currentObject.spoken} उड़`, currentSpeechRate())
     }
 
     const awardPoint = () => {
         score += 1
         updateScore()
+    }
+
+    const startLeaderboardRound = () => {
+        roundStartedAt = performance.now()
+        leaderboardSession = globalLeaderboard?.startSession(playerName)
+    }
+
+    const submitGlobalScore = () => {
+        const session = leaderboardSession
+        const durationMs = Math.round(performance.now() - roundStartedAt)
+        if (!globalLeaderboard || !session || score <= 0) {
+            return
+        }
+        void session
+            .then((sessionID) => sessionID ? globalLeaderboard.submitScore(sessionID, score, durationMs) : null)
+            .then(async (submission) => {
+                const remainingLoaderTime = minimumRankLoadingMs - (performance.now() - rankLoaderStartedAt)
+                if (remainingLoaderTime > 0) {
+                    await new Promise<void>((resolve) => window.setTimeout(resolve, remainingLoaderTime))
+                }
+                if (submission) {
+                    renderGlobalRank(submission)
+                    return globalLeaderboard.refresh()
+                }
+                renderGlobalRankUnavailable()
+                return undefined
+            })
+    }
+
+    const renderGlobalRank = (submission: ScoreSubmission) => {
+        const rank = content.querySelector<HTMLElement>('#global-rank')
+        const playerRow = rank?.querySelector<HTMLParagraphElement>('.rank-loader-player')
+        const slots = rank ? Array.from(rank.querySelectorAll<HTMLParagraphElement>('.rank-loader-slot')) : []
+        if (!rank || !playerRow || slots.length !== 3) {
+            return
+        }
+        rank.querySelector('.sr-only')?.remove()
+
+        const player = { rank: submission.rank, score, player: playerName, isPlayer: true }
+        const rows: Array<DisplayRankRow | undefined> = submission.rank === 1
+            ? [player, submission.below, submission.belowNext]
+            : !submission.below
+                ? [submission.aboveNext, submission.above, player]
+                : [submission.above, player, submission.below]
+        const playerIndex = rows.findIndex((row) => row?.isPlayer)
+        const rowStep = slots[1].offsetTop - slots[0].offsetTop
+        const currentY = rowStep
+        rank.classList.remove('is-loading')
+        populateRankRow(playerRow, player, true)
+
+        rows.forEach((row, index) => {
+            const slot = slots[index]
+            if (row?.isPlayer) {
+                slot.hidden = true
+                return
+            }
+            if (row) {
+                populateRankRow(slot, row)
+            } else {
+                slot.hidden = true
+            }
+        })
+
+        const destinationY = playerIndex * rowStep
+        const finish = () => {
+            playerRow.style.transform = `translateY(${destinationY}px)`
+            playerRow.classList.add('is-resolved')
+            if (submission.isUniqueLeader) {
+                celebrateNewLeader()
+            }
+        }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            finish()
+            return
+        }
+        const settle = playerRow.animate([
+            { transform: `translateY(${currentY}px)` },
+            { transform: `translateY(${destinationY}px)` },
+        ], { duration: 550, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' })
+        void settle.finished.then(() => {
+            finish()
+            settle.cancel()
+        }).catch(() => undefined)
+    }
+
+    const renderGlobalRankUnavailable = () => {
+        const rank = content.querySelector<HTMLElement>('#global-rank')
+        if (rank) {
+            rank.classList.remove('is-loading')
+            rank.textContent = 'Your global rank could not be loaded.'
+        }
+    }
+
+    const renderGlobalRankLoading = () => {
+        const rank = content.querySelector<HTMLElement>('#global-rank')
+        if (!rank) {
+            return
+        }
+        rankLoaderStartedAt = performance.now()
+        rank.replaceChildren()
+        rank.classList.add('is-loading')
+        const firstSlot = rankSkeleton()
+        const secondSlot = rankSkeleton()
+        const thirdSlot = rankSkeleton()
+        firstSlot.classList.add('rank-loader-slot')
+        secondSlot.classList.add('rank-loader-slot')
+        thirdSlot.classList.add('rank-loader-slot')
+        const player = rankRow({ rank: '', score, player: playerName }, true)
+        player.classList.add('rank-loader-player')
+        const announcement = document.createElement('span')
+        announcement.className = 'sr-only'
+        announcement.textContent = 'Calculating your global rank.'
+        rank.append(firstSlot, secondSlot, thirdSlot, player, announcement)
+        const rowStep = secondSlot.offsetTop - firstSlot.offsetTop
+        player.style.transform = `translateY(${rowStep}px)`
+    }
+
+    const rankSkeleton = () => {
+        const row = document.createElement('p')
+        row.className = 'global-rank-row rank-skeleton'
+        for (let index = 0; index < 3; index += 1) {
+            row.append(document.createElement('span'))
+        }
+        return row
+    }
+
+    const rankRow = (entry: { rank: number | '', score: number, player: string }, isPlayer = false) => {
+        const row = document.createElement('p')
+        populateRankRow(row, entry, isPlayer)
+        return row
+    }
+
+    const populateRankRow = (row: HTMLParagraphElement, entry: { rank: number | '', score: number, player: string }, isPlayer = false) => {
+        const isLoaderSlot = row.classList.contains('rank-loader-slot')
+        const isLoaderPlayer = row.classList.contains('rank-loader-player')
+        row.className = 'global-rank-row'
+        row.classList.toggle('rank-loader-slot', isLoaderSlot)
+        row.classList.toggle('rank-loader-player', isLoaderPlayer)
+        row.classList.toggle('is-player', isPlayer)
+        const rankValue = document.createElement('span')
+        const scoreValue = document.createElement('strong')
+        const player = document.createElement('span')
+        rankValue.textContent = entry.rank === '' ? '' : `#${entry.rank}`
+        scoreValue.textContent = String(entry.score)
+        player.textContent = entry.player
+        row.replaceChildren(rankValue, scoreValue, player)
+    }
+
+    const celebrateNewLeader = () => {
+        const result = content.querySelector<HTMLElement>('.result-content')
+        if (!result || result.querySelector('.confetti')) {
+            return
+        }
+        const confetti = document.createElement('div')
+        confetti.className = 'confetti'
+        confetti.setAttribute('aria-hidden', 'true')
+        const colors = ['#b9553b', '#d6a12a', '#52734d', '#243b67']
+        for (let index = 0; index < 28; index += 1) {
+            const piece = document.createElement('span')
+            piece.style.setProperty('--x', `${Math.round(Math.random() * 100)}%`)
+            piece.style.setProperty('--delay', `${Math.round(Math.random() * 180)}ms`)
+            piece.style.setProperty('--color', colors[index % colors.length])
+            piece.style.setProperty('--turn', `${Math.round((Math.random() - 0.5) * 540)}deg`)
+            confetti.append(piece)
+        }
+        result.append(confetti)
     }
 
     const renderResult = (reason: EndReason, object: Candidate) => {
@@ -198,8 +340,7 @@ function Game(game: HTMLDivElement | null) {
         activePointerId = null
         clearTimer()
         setHoldingAppearance(false)
-        saveScore()
-        renderScores()
+        submitGlobalScore()
         game.dataset.state = state
 
         const message = reason === 'released-too-early'
@@ -210,6 +351,7 @@ function Game(game: HTMLDivElement | null) {
           <div class="result-content" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">
             <p class="result-message">${message}</p>
             <p class="result-score">You scored <strong>${score}</strong></p>
+            <div id="global-rank" class="global-rank" role="status" aria-live="polite" aria-atomic="true">${score > 0 ? '' : 'Score a point to earn a global rank.'}</div>
             <div class="result-actions">
               <button id="play-again" class="start-button" type="button">Play again</button>
               <button id="change-player" class="text-button" type="button">Change player</button>
@@ -217,9 +359,14 @@ function Game(game: HTMLDivElement | null) {
           </div>
         `
 
+        if (score > 0) {
+            renderGlobalRankLoading()
+        }
+
         content.querySelector<HTMLButtonElement>('#play-again')?.addEventListener('click', () => {
             score = 0
             currentObject = selectRandom(objects)
+            startLeaderboardRound()
             renderPlaying('Place your finger on the table to begin')
         })
         content.querySelector<HTMLButtonElement>('#change-player')?.addEventListener('click', renderReady)
@@ -340,12 +487,27 @@ function Game(game: HTMLDivElement | null) {
                 releaseHold()
             }
         })
-        table.focus()
+        table.focus({ preventScroll: true })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         announce(prompt)
     }
 
     window.addEventListener('blur', cancelHold)
-    renderScores()
+    document.addEventListener('keydown', (event) => {
+        if (state === 'playing' && (event.key === ' ' || event.key === 'Enter')) {
+            event.preventDefault()
+            startHold()
+        }
+        if (state === 'result' && event.key === ' ' && !(event.target instanceof HTMLButtonElement)) {
+            event.preventDefault()
+        }
+    })
+    document.addEventListener('keyup', (event) => {
+        if (state === 'playing' && (event.key === ' ' || event.key === 'Enter')) {
+            event.preventDefault()
+            releaseHold()
+        }
+    })
     renderReady()
 }
 
