@@ -316,13 +316,19 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: GlobalLeaderboard
 
     const celebrateNewLeader = () => {
         const result = content.querySelector<HTMLElement>('.result-content')
-        if (!result || result.querySelector('.confetti')) {
+        if (!result || result.querySelector('.confetti') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             return
         }
         const confetti = document.createElement('div')
         confetti.className = 'confetti'
         confetti.setAttribute('aria-hidden', 'true')
         const colors = ['#b9553b', '#d6a12a', '#52734d', '#243b67']
+        let piecesRemaining = 28
+        confetti.addEventListener('animationend', (event) => {
+            if (event.target instanceof HTMLSpanElement && --piecesRemaining === 0) {
+                confetti.remove()
+            }
+        })
         for (let index = 0; index < 28; index += 1) {
             const piece = document.createElement('span')
             piece.style.setProperty('--x', `${Math.round(Math.random() * 100)}%`)

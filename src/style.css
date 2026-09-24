@@ -500,12 +500,13 @@ input:focus-visible {
     width: 0.55rem;
     height: 0.8rem;
     background: var(--color);
-    animation: confetti-fall 1.8s ease-out var(--delay) both;
+    animation: confetti-fall 1.8s ease-in var(--delay) both;
 }
 
 @keyframes confetti-fall {
-    from { transform: translateY(0) rotate(0deg); }
-    to { transform: translateY(14rem) rotate(var(--turn)); }
+    from { opacity: 1; transform: translateY(0) rotate(0deg); }
+    75% { opacity: 1; }
+    to { opacity: 0; transform: translateY(18rem) rotate(var(--turn)); }
 }
 
 .result-actions {
