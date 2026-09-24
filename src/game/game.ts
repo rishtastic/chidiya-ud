@@ -1,5 +1,5 @@
 import objects from './items/standard'
-import GlobalLeaderboard, { type ScoreSubmission } from './global-leaderboard'
+import type { Leaderboard, ScoreSubmission } from './global-leaderboard'
 import type { Candidate } from './types'
 import { bolo, selectRandom } from './utils'
 
@@ -13,7 +13,7 @@ type ScreenState = 'ready' | 'playing' | 'result'
 type EndReason = 'released-too-early' | 'held-too-long'
 type DisplayRankRow = { rank: number, score: number, player: string, isPlayer?: boolean }
 
-function Game(game: HTMLDivElement | null, globalLeaderboard?: GlobalLeaderboard) {
+function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
     if (!game) {
         console.error('Game not initialised')
         return
@@ -255,7 +255,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: GlobalLeaderboard
         const rank = content.querySelector<HTMLElement>('#global-rank')
         if (rank) {
             rank.classList.remove('is-loading')
-            rank.textContent = 'Your global rank could not be loaded.'
+            rank.textContent = 'Your rank could not be loaded.'
         }
     }
 
@@ -277,7 +277,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: GlobalLeaderboard
         player.classList.add('rank-loader-player')
         const announcement = document.createElement('span')
         announcement.className = 'sr-only'
-        announcement.textContent = 'Calculating your global rank.'
+        announcement.textContent = 'Calculating your rank.'
         rank.append(firstSlot, secondSlot, thirdSlot, player, announcement)
         const rowStep = secondSlot.offsetTop - firstSlot.offsetTop
         player.style.transform = `translateY(${rowStep}px)`
@@ -357,7 +357,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: GlobalLeaderboard
           <div class="result-content" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">
             <p class="result-message">${message}</p>
             <p class="result-score">You scored <strong>${score}</strong></p>
-            <div id="global-rank" class="global-rank" role="status" aria-live="polite" aria-atomic="true">${score > 0 ? '' : 'Score a point to earn a global rank.'}</div>
+            <div id="global-rank" class="global-rank" role="status" aria-live="polite" aria-atomic="true">${score > 0 ? '' : 'Score a point to earn a rank.'}</div>
             <div class="result-actions">
               <button id="play-again" class="start-button" type="button">Play again</button>
               <button id="change-player" class="text-button" type="button">Change player</button>

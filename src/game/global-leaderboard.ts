@@ -28,6 +28,12 @@ export interface RankedLeaderboardScore {
     rank: number
 }
 
+export interface Leaderboard {
+    startSession(player: string): Promise<string | null>
+    submitScore(sessionId: string, score: number, durationMs: number): Promise<ScoreSubmission | null>
+    refresh(): Promise<void>
+}
+
 const apiBase = `${import.meta.env.BASE_URL}api`
 
 export default class GlobalLeaderboard {

@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile # 2. FIX: Ensures clean install from lockfile
       - name: Build
-        run: yarn build
+        run: yarn build --mode pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

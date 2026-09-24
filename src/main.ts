@@ -1,10 +1,13 @@
 import './style.css'
 import Game from './game/game.ts'
 import GlobalLeaderboard from './game/global-leaderboard.ts'
+import LocalLeaderboard from './game/local-leaderboard.ts'
 
-const globalLeaderboard = new GlobalLeaderboard(document.querySelector<HTMLElement>('#global-scoreboard'))
-Game(document.querySelector<HTMLDivElement>('#game'), globalLeaderboard)
-void globalLeaderboard.refresh()
+const leaderboard = import.meta.env.MODE === 'pages'
+    ? new LocalLeaderboard(document.querySelector<HTMLElement>('#global-scoreboard'))
+    : new GlobalLeaderboard(document.querySelector<HTMLElement>('#global-scoreboard'))
+Game(document.querySelector<HTMLDivElement>('#game'), leaderboard)
+void leaderboard.refresh()
 
 const controlsDialog = document.querySelector<HTMLDialogElement>('#controls-dialog')
 
