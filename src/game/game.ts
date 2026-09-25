@@ -12,7 +12,7 @@ const minimumRankLoadingMs = 1800
 type ScreenState = 'ready' | 'playing' | 'result'
 type EndReason = 'released-too-early' | 'held-too-long'
 type DisplayRankRow = { rank: number, score: number, player: string, isPlayer?: boolean }
-type LanguageChoice = 'english' | 'hindi' | 'both'
+type LanguageChoice = 'english' | 'hindi'
 
 function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
     if (!game) {
@@ -30,7 +30,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
 
     let state: ScreenState = 'ready'
     let playerName = ''
-    let itemPool = [...englishItems, ...hindiItems]
+    let itemPool = englishItems
     let currentObject = selectRandom(itemPool)
     let score = 0
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -77,14 +77,8 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
                 return
             }
             const selectedLanguage = new FormData(form).get('language')
-            const language: LanguageChoice = selectedLanguage === 'english' || selectedLanguage === 'hindi'
-                ? selectedLanguage
-                : 'both'
-            itemPool = language === 'english'
-                ? englishItems
-                : language === 'hindi'
-                    ? hindiItems
-                    : [...englishItems, ...hindiItems]
+            const language: LanguageChoice = selectedLanguage === 'hindi' ? 'hindi' : 'english'
+            itemPool = language === 'english' ? englishItems : hindiItems
             playerName = name
             score = 0
             currentObject = selectRandom(itemPool)
