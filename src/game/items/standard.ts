@@ -1,8 +1,6 @@
 import type { Candidate } from "../types"
 
-type BilingualItem = Omit<Candidate, 'callSuffix'>
-
-const objects: BilingualItem[] = [
+const objects: Candidate[] = [
     { name: "chidiya", spoken: "चिड़िया", canFly: true },
     { name: "kauwa", spoken: "कौवा", canFly: true },
     { name: "kabootar", spoken: "कबूतर", canFly: true },
@@ -238,11 +236,10 @@ const englishNames: Record<string, string> = {
 
 export const englishItems: Candidate[] = objects.map((item) => {
     const name = englishNames[item.name] ?? item.name
-    return { ...item, name, spoken: name, callSuffix: 'ud' }
+    return { ...item, name }
 })
 
 export const hindiItems: Candidate[] = objects.map((item) => ({
     ...item,
     name: item.spoken,
-    callSuffix: 'उड़',
 }))

@@ -171,7 +171,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
     const showCurrentObject = () => {
         updatePrompt(currentObject.name)
         announce(`${currentObject.name}. Lift if it can fly. Score ${score}.`)
-        bolo(`${currentObject.spoken} ${currentObject.callSuffix}`, currentSpeechRate())
+        bolo(`${currentObject.spoken} उड़`, currentSpeechRate())
     }
 
     const awardPoint = () => {
