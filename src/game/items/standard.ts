@@ -236,7 +236,7 @@ const englishNames: Record<string, string> = {
 
 export const englishItems: Candidate[] = objects.map((item) => {
     const name = englishNames[item.name] ?? item.name
-    return { ...item, name }
+    return { ...item, name, spoken: name }
 })
 
 export const hindiItems: Candidate[] = objects.map((item) => ({
