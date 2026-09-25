@@ -231,3 +231,8 @@ const hindiItemNames = new Set([
 
 export const englishItems = objects.filter((item) => !hindiItemNames.has(item.name))
 export const hindiItems = objects.filter((item) => hindiItemNames.has(item.name))
+
+export const itemLists = {
+    english: englishItems,
+    hindi: hindiItems,
+}

@@ -1,4 +1,4 @@
-import { englishItems, hindiItems } from './items/standard'
+import { itemLists } from './items/standard'
 import type { Leaderboard, ScoreSubmission } from './global-leaderboard'
 import type { Candidate } from './types'
 import { bolo, selectRandom } from './utils'
@@ -28,7 +28,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
 
     let state: ScreenState = 'ready'
     let playerName = ''
-    let itemPool = englishItems
+    let itemPool = itemLists.english
     let currentObject = selectRandom(itemPool)
     let score = 0
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -75,10 +75,8 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
                 return
             }
             const languages = new FormData(form).getAll('language')
-            itemPool = [
-                ...(languages.includes('english') ? englishItems : []),
-                ...(languages.includes('hindi') ? hindiItems : []),
-            ]
+                .filter((value): value is keyof typeof itemLists => typeof value === 'string' && Object.hasOwn(itemLists, value))
+            itemPool = languages.flatMap((language) => itemLists[language])
             if (itemPool.length === 0) {
                 error.textContent = 'Choose at least one item language.'
                 return
