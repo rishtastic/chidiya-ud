@@ -1,4 +1,4 @@
-import { itemLists } from './items/standard'
+import { itemLists } from './items/lists'
 import type { Leaderboard, ScoreSubmission } from './global-leaderboard'
 import type { Candidate } from './types'
 import { bolo, selectRandom } from './utils'
@@ -28,8 +28,8 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
 
     let state: ScreenState = 'ready'
     let playerName = ''
-    let itemPool = itemLists.english
-    let currentObject = selectRandom(itemPool)
+    let itemPool: Candidate[] = []
+    let currentObject: Candidate
     let score = 0
     let timer: ReturnType<typeof setTimeout> | undefined
     let holding = false

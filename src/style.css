@@ -143,7 +143,7 @@ input:focus-visible {
     text-transform: uppercase;
 }
 
-.player-form input {
+.player-form > input {
     width: 100%;
     min-height: 3.8rem;
     border: 3px solid #243b67;
@@ -154,7 +154,7 @@ input:focus-visible {
     padding: 0.75rem 1rem;
 }
 
-.player-form input::placeholder {
+.player-form > input::placeholder {
     color: #647080;
 }
 
@@ -180,21 +180,24 @@ input:focus-visible {
 
 .language-picker label {
     flex: 1;
+    position: relative;
     cursor: pointer;
-}
-
-.language-picker input {
-    position: absolute;
-    opacity: 0;
-}
-
-.language-picker label {
     border: 2px solid #243b67;
     border-radius: 0.4rem;
     background: #fff9ed;
     color: #243b67;
     padding: 0.55rem 0.25rem;
     text-align: center;
+}
+
+.language-picker input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
 }
 
 .language-picker label:has(input:checked) {

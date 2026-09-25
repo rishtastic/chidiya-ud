@@ -1,71 +1,28 @@
 import type { Candidate } from "../types"
 
-const objects: Candidate[] = [
-    { name: "chidiya", spoken: "चिड़िया", canFly: true },
-    { name: "kauwa", spoken: "कौवा", canFly: true },
-    { name: "kabootar", spoken: "कबूतर", canFly: true },
-    { name: "tota", spoken: "तोता", canFly: true },
-    { name: "mor", spoken: "मोर", canFly: true },
-    { name: "murgi", spoken: "मुर्गी", canFly: true },
-    { name: "batakh", spoken: "बत्तख", canFly: true },
-    { name: "hans", spoken: "हंस", canFly: true },
-    { name: "baaz", spoken: "बाज़", canFly: true },
-    { name: "cheel", spoken: "चील", canFly: true },
-    { name: "ullu", spoken: "उल्लू", canFly: true },
-    { name: "maina", spoken: "मैना", canFly: true },
-    { name: "bulbul", spoken: "बुलबुल", canFly: true },
-    { name: "koel", spoken: "कोयल", canFly: true },
+export const englishItems: Candidate[] = [
     { name: "flamingo", spoken: "फ्लेमिंगो", canFly: true },
     { name: "penguin", spoken: "पेंगुइन", canFly: false },
     { name: "ostrich", spoken: "ऑस्ट्रिच", canFly: false },
     { name: "emu", spoken: "ईमू", canFly: false },
     { name: "kiwi", spoken: "कीवी", canFly: false },
-    { name: "murga", spoken: "मुर्गा", canFly: false },
 
-    { name: "chamgadad", spoken: "चमगादड़", canFly: true },
-    { name: "titli", spoken: "तितली", canFly: true },
-    { name: "madhumakkhi", spoken: "मधुमक्खी", canFly: true },
-    { name: "machhar", spoken: "मच्छर", canFly: true },
-    { name: "makhi", spoken: "मक्खी", canFly: true },
     { name: "dragonfly", spoken: "ड्रैगनफ्लाई", canFly: true },
-    { name: "tiddi", spoken: "टिड्डी", canFly: true },
-    { name: "patanga", spoken: "पतंगा", canFly: true },
+
     { name: "ladybug", spoken: "लेडीबग", canFly: true },
     { name: "cockroach", spoken: "कॉकरोच", canFly: true },
 
-    { name: "haathi", spoken: "हाथी", canFly: false },
-    { name: "sher", spoken: "शेर", canFly: false },
-    { name: "bagh", spoken: "बाघ", canFly: false },
     { name: "cheetah", spoken: "चीता", canFly: false },
-    { name: "ghoda", spoken: "घोड़ा", canFly: false },
-    { name: "gadha", spoken: "गधा", canFly: false },
-    { name: "gaay", spoken: "गाय", canFly: false },
-    { name: "bhains", spoken: "भैंस", canFly: false },
-    { name: "bakri", spoken: "बकरी", canFly: false },
-    { name: "bhed", spoken: "भेड़", canFly: false },
-    { name: "kutta", spoken: "कुत्ता", canFly: false },
-    { name: "billi", spoken: "बिल्ली", canFly: false },
-    { name: "khargosh", spoken: "खरगोश", canFly: false },
-    { name: "bandar", spoken: "बंदर", canFly: false },
-    { name: "gorilla", spoken: "गोरिल्ला", canFly: false },
-    { name: "jiraaf", spoken: "जिराफ़", canFly: false },
-    { name: "zebra", spoken: "ज़ेब्रा", canFly: false },
-    { name: "oont", spoken: "ऊँट", canFly: false },
-    { name: "suar", spoken: "सूअर", canFly: false },
-    { name: "hiran", spoken: "हिरण", canFly: false },
 
-    { name: "magarmach", spoken: "मगरमच्छ", canFly: false },
-    { name: "kachhua", spoken: "कछुआ", canFly: false },
-    { name: "saap", spoken: "साँप", canFly: false },
-    { name: "chipkali", spoken: "छिपकली", canFly: false },
-    { name: "mendhak", spoken: "मेंढक", canFly: false },
-    { name: "machhli", spoken: "मछली", canFly: false },
+    { name: "gorilla", spoken: "गोरिल्ला", canFly: false },
+
+    { name: "zebra", spoken: "ज़ेब्रा", canFly: false },
+
     { name: "shark", spoken: "शार्क", canFly: false },
     { name: "whale", spoken: "व्हेल", canFly: false },
     { name: "octopus", spoken: "ऑक्टोपस", canFly: false },
     { name: "crab", spoken: "क्रैब", canFly: false },
 
-    { name: "hawai jahaj", spoken: "हवाई जहाज़", canFly: true },
     { name: "helicopter", spoken: "हेलिकॉप्टर", canFly: true },
     { name: "rocket", spoken: "रॉकेट", canFly: true },
     { name: "drone", spoken: "ड्रोन", canFly: true },
@@ -75,7 +32,6 @@ const objects: Candidate[] = [
     { name: "ufo", spoken: "यूएफ़ओ", canFly: true },
     { name: "paraglider", spoken: "पैराग्लाइडर", canFly: true },
     { name: "glider", spoken: "ग्लाइडर", canFly: true },
-
     { name: "car", spoken: "कार", canFly: false },
     { name: "bus", spoken: "बस", canFly: false },
     { name: "cycle", spoken: "साइकिल", canFly: false },
@@ -87,16 +43,9 @@ const objects: Candidate[] = [
     { name: "truck", spoken: "ट्रक", canFly: false },
     { name: "auto", spoken: "ऑटो", canFly: false },
 
-    { name: "pankha", spoken: "पंखा", canFly: false },
-    { name: "kursi", spoken: "कुर्सी", canFly: false },
-    { name: "mez", spoken: "मेज़", canFly: false },
     { name: "mobile", spoken: "मोबाइल", canFly: false },
     { name: "laptop", spoken: "लैपटॉप", canFly: false },
     { name: "ball", spoken: "बॉल", canFly: false },
-    { name: "patthar", spoken: "पत्थर", canFly: false },
-    { name: "seb", spoken: "सेब", canFly: false },
-    { name: "kela", spoken: "केला", canFly: false },
-    { name: "aam", spoken: "आम", canFly: false },
 
     { name: "superman", spoken: "सुपरमैन", canFly: true },
     { name: "iron man", spoken: "आयरन मैन", canFly: true },
@@ -105,10 +54,9 @@ const objects: Candidate[] = [
     { name: "batman", spoken: "बैटमैन", canFly: false },
     { name: "harry potter", spoken: "हैरी पॉटर", canFly: true },
     { name: "genie", spoken: "जीनी", canFly: true },
-    { name: "pari", spoken: "परी", canFly: true },
+
     { name: "dragon", spoken: "ड्रैगन", canFly: true },
     { name: "unicorn", spoken: "यूनिकॉर्न", canFly: false },
-
     { name: "eagle", spoken: "ईगल", canFly: true },
     { name: "sparrow", spoken: "स्पैरो", canFly: true },
     { name: "crow", spoken: "क्रो", canFly: true },
@@ -129,7 +77,6 @@ const objects: Candidate[] = [
     { name: "swallow", spoken: "स्वॉलो", canFly: true },
     { name: "hummingbird", spoken: "हमिंगबर्ड", canFly: true },
     { name: "macaw", spoken: "मकॉ", canFly: true },
-
     { name: "ant", spoken: "ऐंट", canFly: false },
     { name: "spider", spoken: "स्पाइडर", canFly: false },
     { name: "scorpion", spoken: "स्कॉर्पियन", canFly: false },
@@ -140,7 +87,6 @@ const objects: Candidate[] = [
     { name: "beetle", spoken: "बीटल", canFly: true },
     { name: "wasp", spoken: "वॉस्प", canFly: true },
     { name: "firefly", spoken: "फायरफ्लाई", canFly: true },
-
     { name: "rhino", spoken: "राइनो", canFly: false },
     { name: "hippo", spoken: "हिप्पो", canFly: false },
     { name: "wolf", spoken: "वुल्फ", canFly: false },
@@ -161,7 +107,6 @@ const objects: Candidate[] = [
     { name: "yak", spoken: "याक", canFly: false },
     { name: "buffalo", spoken: "बफैलो", canFly: false },
     { name: "deer", spoken: "डियर", canFly: false },
-
     { name: "dolphin", spoken: "डॉल्फिन", canFly: false },
     { name: "seal", spoken: "सील", canFly: false },
     { name: "walrus", spoken: "वॉलरस", canFly: false },
@@ -172,19 +117,16 @@ const objects: Candidate[] = [
     { name: "eel", spoken: "ईल", canFly: false },
     { name: "stingray", spoken: "स्टिंगरे", canFly: false },
     { name: "seahorse", spoken: "सीहॉर्स", canFly: false },
-
     { name: "zeppelin", spoken: "ज़ेपलिन", canFly: true },
     { name: "airship", spoken: "एयरशिप", canFly: true },
     { name: "fighter jet", spoken: "फाइटर जेट", canFly: true },
     { name: "space shuttle", spoken: "स्पेस शटल", canFly: true },
     { name: "satellite", spoken: "सैटेलाइट", canFly: true },
-
     { name: "submarine", spoken: "सबमरीन", canFly: false },
     { name: "canoe", spoken: "कैनो", canFly: false },
     { name: "kayak", spoken: "कयाक", canFly: false },
     { name: "scooter", spoken: "स्कूटर", canFly: false },
     { name: "skateboard", spoken: "स्केटबोर्ड", canFly: false },
-
     { name: "frisbee", spoken: "फ्रिस्बी", canFly: true },
     { name: "balloon", spoken: "बैलून", canFly: true },
     { name: "soap bubble", spoken: "सोप बबल", canFly: true },
@@ -195,7 +137,6 @@ const objects: Candidate[] = [
     { name: "parachute", spoken: "पैराशूट", canFly: true },
     { name: "confetti", spoken: "कन्फेटी", canFly: true },
     { name: "dust", spoken: "डस्ट", canFly: true },
-
     { name: "table", spoken: "टेबल", canFly: false },
     { name: "sofa", spoken: "सोफ़ा", canFly: false },
     { name: "television", spoken: "टेलीविज़न", canFly: false },
@@ -206,7 +147,6 @@ const objects: Candidate[] = [
     { name: "pencil", spoken: "पेंसिल", canFly: false },
     { name: "bottle", spoken: "बॉटल", canFly: false },
     { name: "umbrella", spoken: "अम्ब्रेला", canFly: true },
-
     { name: "witch", spoken: "विच", canFly: true },
     { name: "ghost", spoken: "घोस्ट", canFly: true },
     { name: "angel", spoken: "एंजेल", canFly: true },
@@ -217,22 +157,4 @@ const objects: Candidate[] = [
     { name: "rocket raccoon", spoken: "रॉकेट रैकून", canFly: false },
     { name: "hulk", spoken: "हल्क", canFly: false },
     { name: "captain america", spoken: "कैप्टन अमेरिका", canFly: false },
-];
-
-const hindiItemNames = new Set([
-    'chidiya', 'kauwa', 'kabootar', 'tota', 'mor', 'murgi', 'batakh', 'hans', 'baaz',
-    'cheel', 'ullu', 'maina', 'bulbul', 'koel', 'murga', 'chamgadad', 'titli',
-    'madhumakkhi', 'machhar', 'makhi', 'tiddi', 'patanga', 'haathi', 'sher', 'bagh',
-    'ghoda', 'gadha', 'gaay', 'bhains', 'bakri', 'bhed', 'kutta', 'billi', 'khargosh',
-    'bandar', 'jiraaf', 'oont', 'suar', 'hiran', 'magarmach', 'kachhua', 'saap',
-    'chipkali', 'mendhak', 'machhli', 'hawai jahaj', 'pankha', 'kursi', 'mez',
-    'patthar', 'seb', 'kela', 'aam', 'pari',
-])
-
-export const englishItems = objects.filter((item) => !hindiItemNames.has(item.name))
-export const hindiItems = objects.filter((item) => hindiItemNames.has(item.name))
-
-export const itemLists = {
-    english: englishItems,
-    hindi: hindiItems,
-}
+]
