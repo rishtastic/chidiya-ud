@@ -12,8 +12,6 @@ const minimumRankLoadingMs = 1800
 type ScreenState = 'ready' | 'playing' | 'result'
 type EndReason = 'released-too-early' | 'held-too-long'
 type DisplayRankRow = { rank: number, score: number, player: string, isPlayer?: boolean }
-type LanguageChoice = 'english' | 'hindi'
-
 function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
     if (!game) {
         console.error('Game not initialised')
@@ -76,9 +74,15 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
                 input.focus()
                 return
             }
-            const selectedLanguage = new FormData(form).get('language')
-            const language: LanguageChoice = selectedLanguage === 'hindi' ? 'hindi' : 'english'
-            itemPool = language === 'english' ? englishItems : hindiItems
+            const languages = new FormData(form).getAll('language')
+            itemPool = [
+                ...(languages.includes('english') ? englishItems : []),
+                ...(languages.includes('hindi') ? hindiItems : []),
+            ]
+            if (itemPool.length === 0) {
+                error.textContent = 'Choose at least one item language.'
+                return
+            }
             playerName = name
             score = 0
             currentObject = selectRandom(itemPool)
@@ -88,6 +92,11 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
 
         input.addEventListener('input', () => {
             error.textContent = ''
+        })
+        form.querySelectorAll<HTMLInputElement>('input[name="language"]').forEach((language) => {
+            language.addEventListener('change', () => {
+                error.textContent = ''
+            })
         })
     }
 
