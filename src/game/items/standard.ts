@@ -219,27 +219,15 @@ const objects: Candidate[] = [
     { name: "captain america", spoken: "कैप्टन अमेरिका", canFly: false },
 ];
 
-const englishNames: Record<string, string> = {
-    chidiya: 'bird', kauwa: 'crow', kabootar: 'pigeon', tota: 'parrot', mor: 'peacock',
-    murgi: 'hen', batakh: 'duck', hans: 'swan', baaz: 'hawk', cheel: 'kite',
-    ullu: 'owl', maina: 'myna', bulbul: 'bulbul', koel: 'cuckoo', murga: 'rooster',
-    chamgadad: 'bat', titli: 'butterfly', madhumakkhi: 'bee', machhar: 'mosquito',
-    makhi: 'fly', tiddi: 'grasshopper', patanga: 'moth', haathi: 'elephant',
-    sher: 'lion', bagh: 'tiger', ghoda: 'horse', gadha: 'donkey', gaay: 'cow',
-    bhains: 'buffalo', bakri: 'goat', bhed: 'sheep', kutta: 'dog', billi: 'cat',
-    khargosh: 'rabbit', bandar: 'monkey', jiraaf: 'giraffe', oont: 'camel',
-    suar: 'pig', hiran: 'deer', magarmach: 'crocodile', kachhua: 'turtle',
-    saap: 'snake', chipkali: 'lizard', mendhak: 'frog', machhli: 'fish',
-    'hawai jahaj': 'aeroplane', pankha: 'fan', kursi: 'chair', mez: 'table',
-    patthar: 'stone', seb: 'apple', kela: 'banana', aam: 'mango', pari: 'fairy',
-}
+const hindiItemNames = new Set([
+    'chidiya', 'kauwa', 'kabootar', 'tota', 'mor', 'murgi', 'batakh', 'hans', 'baaz',
+    'cheel', 'ullu', 'maina', 'bulbul', 'koel', 'murga', 'chamgadad', 'titli',
+    'madhumakkhi', 'machhar', 'makhi', 'tiddi', 'patanga', 'haathi', 'sher', 'bagh',
+    'ghoda', 'gadha', 'gaay', 'bhains', 'bakri', 'bhed', 'kutta', 'billi', 'khargosh',
+    'bandar', 'jiraaf', 'oont', 'suar', 'hiran', 'magarmach', 'kachhua', 'saap',
+    'chipkali', 'mendhak', 'machhli', 'hawai jahaj', 'pankha', 'kursi', 'mez',
+    'patthar', 'seb', 'kela', 'aam', 'pari',
+])
 
-export const englishItems: Candidate[] = objects.map((item) => {
-    const name = englishNames[item.name] ?? item.name
-    return { ...item, name, spoken: name }
-})
-
-export const hindiItems: Candidate[] = objects.map((item) => ({
-    ...item,
-    name: item.spoken,
-}))
+export const englishItems = objects.filter((item) => !hindiItemNames.has(item.name))
+export const hindiItems = objects.filter((item) => hindiItemNames.has(item.name))
