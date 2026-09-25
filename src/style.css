@@ -158,6 +158,54 @@ input:focus-visible {
     color: #647080;
 }
 
+.language-picker {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.language-picker legend {
+    width: 100%;
+    margin-bottom: 0.35rem;
+    color: #243b67;
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.language-picker label {
+    flex: 1;
+    cursor: pointer;
+}
+
+.language-picker input {
+    position: absolute;
+    opacity: 0;
+}
+
+.language-picker label {
+    border: 2px solid #243b67;
+    border-radius: 0.4rem;
+    background: #fff9ed;
+    color: #243b67;
+    padding: 0.55rem 0.25rem;
+    text-align: center;
+}
+
+.language-picker label:has(input:checked) {
+    background: #d6a12a;
+}
+
+.language-picker label:has(input:focus-visible) {
+    outline: 3px solid #52734d;
+    outline-offset: 2px;
+}
+
 .field-error {
     min-height: 1.25rem;
     margin: 0;

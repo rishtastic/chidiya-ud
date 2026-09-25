@@ -1,4 +1,4 @@
-import objects from './items/standard'
+import { englishItems, hindiItems } from './items/standard'
 import type { Leaderboard, ScoreSubmission } from './global-leaderboard'
 import type { Candidate } from './types'
 import { bolo, selectRandom } from './utils'
@@ -12,6 +12,7 @@ const minimumRankLoadingMs = 1800
 type ScreenState = 'ready' | 'playing' | 'result'
 type EndReason = 'released-too-early' | 'held-too-long'
 type DisplayRankRow = { rank: number, score: number, player: string, isPlayer?: boolean }
+type LanguageChoice = 'english' | 'hindi' | 'both'
 
 function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
     if (!game) {
@@ -29,7 +30,8 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
 
     let state: ScreenState = 'ready'
     let playerName = ''
-    let currentObject = selectRandom(objects)
+    let itemPool = [...englishItems, ...hindiItems]
+    let currentObject = selectRandom(itemPool)
     let score = 0
     let timer: ReturnType<typeof setTimeout> | undefined
     let holding = false
@@ -74,9 +76,18 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
                 input.focus()
                 return
             }
+            const selectedLanguage = new FormData(form).get('language')
+            const language: LanguageChoice = selectedLanguage === 'english' || selectedLanguage === 'hindi'
+                ? selectedLanguage
+                : 'both'
+            itemPool = language === 'english'
+                ? englishItems
+                : language === 'hindi'
+                    ? hindiItems
+                    : [...englishItems, ...hindiItems]
             playerName = name
             score = 0
-            currentObject = selectRandom(objects)
+            currentObject = selectRandom(itemPool)
             startLeaderboardRound()
             renderPlaying('Place your finger on the table to begin')
         })
@@ -160,7 +171,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
     const showCurrentObject = () => {
         updatePrompt(currentObject.name)
         announce(`${currentObject.name}. Lift if it can fly. Score ${score}.`)
-        bolo(`${currentObject.spoken} उड़`, currentSpeechRate())
+        bolo(`${currentObject.spoken} ${currentObject.callSuffix}`, currentSpeechRate())
     }
 
     const awardPoint = () => {
@@ -371,7 +382,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
 
         content.querySelector<HTMLButtonElement>('#play-again')?.addEventListener('click', () => {
             score = 0
-            currentObject = selectRandom(objects)
+            currentObject = selectRandom(itemPool)
             startLeaderboardRound()
             renderPlaying('Place your finger on the table to begin')
         })
@@ -388,7 +399,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
             return
         }
         awardPoint()
-        currentObject = selectRandom(objects)
+        currentObject = selectRandom(itemPool)
         showCurrentObject()
         timer = setTimeout(resolveHold, currentResponseTime())
     }
@@ -418,7 +429,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
         }
 
         awardPoint()
-        currentObject = selectRandom(objects)
+        currentObject = selectRandom(itemPool)
         updatePrompt('Good catch. Place your finger for the next item', true)
         announce(`Good catch. Score ${score}. Place your finger on the table for the next item.`)
     }

@@ -47,6 +47,12 @@
               <form id="player-form" class="player-form" action="#game" method="get" novalidate>
                 <label for="player">Your name</label>
                 <input id="player" name="player" maxlength="24" autocomplete="name" placeholder="Enter your name" required />
+                <fieldset class="language-picker">
+                  <legend>Language</legend>
+                  <label><input type="radio" name="language" value="english" /> English</label>
+                  <label><input type="radio" name="language" value="hindi" /> Hindi</label>
+                  <label><input type="radio" name="language" value="both" checked /> Both</label>
+                </fieldset>
                 <p id="name-error" class="field-error" role="alert"></p>
                 <button type="submit" class="start-button">Start game</button>
                 <button id="controls-trigger" class="controls-button" type="button" aria-haspopup="dialog" aria-controls="controls-dialog">Controls</button>
