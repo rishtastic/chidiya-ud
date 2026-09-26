@@ -208,6 +208,30 @@ func TestScoreRejectsImpossibleDuration(t *testing.T) {
 	}
 }
 
+func TestRateLimitsAllowRepeatGamesAndEnforceCap(t *testing.T) {
+	handler := newTestServer(t)
+	for i := 0; i < 120; i++ {
+		response := requestJSON(t, handler, http.MethodPost, apiPrefix+"/sessions", map[string]string{"player": "Ananya"})
+		if response.Code != http.StatusCreated {
+			t.Fatalf("session %d status = %d, want %d", i+1, response.Code, http.StatusCreated)
+		}
+		var session sessionResponseBody
+		if err := json.Unmarshal(response.Body.Bytes(), &session); err != nil {
+			t.Fatal(err)
+		}
+		response = requestJSON(t, handler, http.MethodPost, apiPrefix+"/scores", map[string]any{"sessionId": session.SessionID, "score": 1, "durationMs": 75})
+		if response.Code != http.StatusCreated {
+			t.Fatalf("score %d status = %d, want %d", i+1, response.Code, http.StatusCreated)
+		}
+	}
+	for _, path := range []string{"/sessions", "/scores"} {
+		response := requestJSON(t, handler, http.MethodPost, apiPrefix+path, map[string]string{})
+		if response.Code != http.StatusTooManyRequests {
+			t.Fatalf("%s status = %d, want %d", path, response.Code, http.StatusTooManyRequests)
+		}
+	}
+}
+
 type sessionResponseBody struct {
 	SessionID string `json:"sessionId"`
 }

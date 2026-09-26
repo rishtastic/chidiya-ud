@@ -23,6 +23,8 @@ const (
 	maxScore           = 250
 	sessionLifetime    = 15 * time.Minute
 	minimumPointMillis = 75
+	gameRequestLimit   = 120
+	gameRequestPeriod  = 10 * time.Minute
 )
 
 type score struct {
@@ -163,7 +165,7 @@ func (s *server) listScores(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (s *server) createSession(w http.ResponseWriter, r *http.Request) {
-	if !s.limiter.allow("session:"+clientIP(r), 15, time.Hour) {
+	if !s.limiter.allow("session:"+clientIP(r), gameRequestLimit, gameRequestPeriod) {
 		writeError(w, http.StatusTooManyRequests, "Please wait before starting another game.")
 		return
 	}
@@ -192,7 +194,7 @@ func (s *server) createSession(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) createScore(w http.ResponseWriter, r *http.Request) {
-	if !s.limiter.allow("score:"+clientIP(r), 15, time.Hour) {
+	if !s.limiter.allow("score:"+clientIP(r), gameRequestLimit, gameRequestPeriod) {
 		writeError(w, http.StatusTooManyRequests, "Please wait before submitting another score.")
 		return
 	}
