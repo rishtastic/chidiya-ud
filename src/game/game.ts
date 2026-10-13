@@ -28,6 +28,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
 
     let state: ScreenState = 'ready'
     let playerName = ''
+    let playerPassword = ''
     let itemPool: Candidate[] = []
     let currentObject: Candidate
     let score = 0
@@ -54,6 +55,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
 
     const renderReady = () => {
         state = 'ready'
+        playerPassword = ''
         holding = false
         clearTimer()
         game.dataset.state = state
@@ -62,12 +64,19 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
         const form = content.querySelector<HTMLFormElement>('#player-form')
         const input = content.querySelector<HTMLInputElement>('#player')
         const error = content.querySelector<HTMLElement>('#name-error')
-        if (!form || !input || !error) {
+        const password = content.querySelector<HTMLInputElement>('#player-password')
+        const passwordLabel = content.querySelector<HTMLLabelElement>('#player-password-label')
+        const startButton = form?.querySelector<HTMLButtonElement>('button[type="submit"]')
+        if (!form || !input || !error || !password || !passwordLabel || !startButton) {
             return
         }
 
-        form.addEventListener('submit', (event) => {
+        password.hidden = import.meta.env.MODE === 'pages'
+        passwordLabel.hidden = password.hidden
+
+        form.addEventListener('submit', async (event) => {
             event.preventDefault()
+            if (startButton.disabled) return
             const name = input.value.trim().slice(0, nameLimit)
             if (!name) {
                 error.textContent = 'Please enter your name to play.'
@@ -81,14 +90,33 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
                 error.textContent = 'Choose at least one item language.'
                 return
             }
+            let authenticatedSession: Promise<string | null> | undefined
+            if (import.meta.env.MODE !== 'pages') {
+                startButton.disabled = true
+                input.disabled = true
+                password.disabled = true
+                const sessionID = await globalLeaderboard?.startSession(name, password.value || undefined)
+                startButton.disabled = false
+                input.disabled = false
+                password.disabled = false
+                if (!sessionID) {
+                    error.textContent = 'Could not start the game. If this name is protected, check its password.'
+                    return
+                }
+                playerPassword = password.value
+                authenticatedSession = Promise.resolve(sessionID)
+            }
             playerName = name
             score = 0
             currentObject = selectRandom(itemPool)
-            startLeaderboardRound()
+            startLeaderboardRound(authenticatedSession)
             renderPlaying('Place your finger on the table to begin')
         })
 
         input.addEventListener('input', () => {
+            error.textContent = ''
+        })
+        password.addEventListener('input', () => {
             error.textContent = ''
         })
         form.querySelectorAll<HTMLInputElement>('input[name="language"]').forEach((language) => {
@@ -180,9 +208,9 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
         updateScore()
     }
 
-    const startLeaderboardRound = () => {
+    const startLeaderboardRound = (session?: Promise<string | null>) => {
         roundStartedAt = performance.now()
-        leaderboardSession = globalLeaderboard?.startSession(playerName)
+        leaderboardSession = session ?? globalLeaderboard?.startSession(playerName, playerPassword || undefined)
     }
 
     const submitGlobalScore = () => {
@@ -381,10 +409,23 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
             renderGlobalRankLoading()
         }
 
-        content.querySelector<HTMLButtonElement>('#play-again')?.addEventListener('click', () => {
+        content.querySelector<HTMLButtonElement>('#play-again')?.addEventListener('click', async (event) => {
+            let authenticatedSession: Promise<string | null> | undefined
+            if (import.meta.env.MODE !== 'pages') {
+                const button = event.currentTarget as HTMLButtonElement
+                button.disabled = true
+                const sessionID = await globalLeaderboard?.startSession(playerName, playerPassword)
+                button.disabled = false
+                if (!sessionID) {
+                    const rank = content.querySelector<HTMLElement>('#global-rank')
+                    if (rank) rank.textContent = 'Could not start another game. Try again.'
+                    return
+                }
+                authenticatedSession = Promise.resolve(sessionID)
+            }
             score = 0
             currentObject = selectRandom(itemPool)
-            startLeaderboardRound()
+            startLeaderboardRound(authenticatedSession)
             renderPlaying('Place your finger on the table to begin')
         })
         content.querySelector<HTMLButtonElement>('#change-player')?.addEventListener('click', renderReady)

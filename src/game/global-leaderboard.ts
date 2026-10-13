@@ -29,7 +29,7 @@ export interface RankedLeaderboardScore {
 }
 
 export interface Leaderboard {
-    startSession(player: string): Promise<string | null>
+    startSession(player: string, password?: string): Promise<string | null>
     submitScore(sessionId: string, score: number, durationMs: number): Promise<ScoreSubmission | null>
     refresh(): Promise<void>
 }
@@ -43,12 +43,12 @@ export default class GlobalLeaderboard {
         this.container = container
     }
 
-    async startSession(player: string): Promise<string | null> {
+    async startSession(player: string, password?: string): Promise<string | null> {
         try {
             const response = await fetch(`${apiBase}/sessions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player }),
+                body: JSON.stringify(password ? { player, password } : { player }),
             })
             if (!response.ok) {
                 return null

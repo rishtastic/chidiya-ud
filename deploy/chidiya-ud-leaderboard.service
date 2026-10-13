@@ -7,6 +7,7 @@ Type=simple
 User=codex-deploy
 Group=codex-deploy
 WorkingDirectory=/srv/chidiya-ud
+EnvironmentFile=-/srv/chidiya-ud/admin-auth.env
 ExecStart=/usr/local/bin/chidiya-ud-leaderboard -addr 127.0.0.1:8082 -db /srv/chidiya-ud/data/chidiya-ud.db
 Restart=on-failure
 RestartSec=3

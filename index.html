@@ -47,6 +47,8 @@
               <form id="player-form" class="player-form" action="#game" method="get" novalidate>
                 <label for="player">Your name</label>
                 <input id="player" name="player" maxlength="24" autocomplete="name" placeholder="Enter your name" required />
+                <label id="player-password-label" for="player-password">Password (only for protected names)</label>
+                <input id="player-password" type="password" autocomplete="current-password" />
                 <fieldset class="language-picker">
                   <legend>Language</legend>
                   <label><input type="checkbox" name="language" value="english" /> English</label>

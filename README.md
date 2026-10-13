@@ -39,6 +39,17 @@ service and route definitions are in `deploy/`.
   private so a caller cannot forge that header directly.
 - SQLite runs in WAL mode with a busy timeout, suitable for this low-volume
   workload without an additional paid service.
+- A protected username is configured with `SUPER_ADMIN_USERNAME` and a bcrypt
+  `SUPER_ADMIN_PASSWORD_HASH`. Store both in `/srv/chidiya-ud/admin-auth.env`
+  with owner `codex-deploy` and mode `0600`; the service unit loads that file.
+  Run `go run ./cmd/admin-password` in a terminal to generate the hash line.
+  Never commit the username, hash, or password. With no configured hash, the
+  protected username cannot log in while other players can still play.
+- Five failed passwords from one address block protected login for 15 minutes.
+  Existing scores matching the configured username remain in SQLite but are
+  omitted from public scores and rank calculations. The authenticated player
+  sees their private rank among all scores after a game. GitHub Pages has no
+  server authentication; its device-only game and leaderboard stay unchanged.
 
 This is abuse resistance, not an impossibility proof against a determined
 player who modifies their browser. A later server-authoritative event sequence

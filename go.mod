@@ -2,7 +2,11 @@ module github.com/rishtastic/chidiya-ud
 
 go 1.27.0
 
-require modernc.org/sqlite v1.47.0
+require (
+	golang.org/x/crypto v0.33.0
+	golang.org/x/term v0.29.0
+	modernc.org/sqlite v1.47.0
+)
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect

@@ -10,7 +10,7 @@ export default class LocalLeaderboard implements Leaderboard {
         this.container = container
     }
 
-    async startSession(player: string): Promise<string> {
+    async startSession(player: string): Promise<string | null> {
         return player
     }
 

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/rishtastic/chidiya-ud/internal/leaderboard"
+	"golang.org/x/crypto/bcrypt"
 	_ "modernc.org/sqlite"
 )
 
@@ -17,6 +18,14 @@ func main() {
 	address := flag.String("addr", "127.0.0.1:8082", "HTTP listen address")
 	databasePath := flag.String("db", "./data/chidiya-ud.db", "SQLite database path")
 	flag.Parse()
+	if hash := os.Getenv("SUPER_ADMIN_PASSWORD_HASH"); hash != "" {
+		if _, err := bcrypt.Cost([]byte(hash)); err != nil {
+			log.Fatal("Invalid SUPER_ADMIN_PASSWORD_HASH: ", err)
+		}
+		if os.Getenv("SUPER_ADMIN_USERNAME") == "" {
+			log.Fatal("SUPER_ADMIN_USERNAME is required with SUPER_ADMIN_PASSWORD_HASH")
+		}
+	}
 
 	if err := os.MkdirAll(filepath.Dir(*databasePath), 0750); err != nil {
 		log.Fatal(err)

@@ -11,10 +11,13 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
 	"unicode/utf8"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -25,6 +28,8 @@ const (
 	minimumPointMillis = 75
 	gameRequestLimit   = 120
 	gameRequestPeriod  = 10 * time.Minute
+	adminLoginFailures = 5
+	adminLoginPeriod   = 15 * time.Minute
 )
 
 type score struct {
@@ -34,7 +39,8 @@ type score struct {
 }
 
 type sessionRequest struct {
-	Player string `json:"player"`
+	Player   string `json:"player"`
+	Password string `json:"password"`
 }
 
 type scoreRequest struct {
@@ -83,14 +89,35 @@ func (r *rateLimiter) allow(key string, limit int, period time.Duration) bool {
 	return true
 }
 
+func (r *rateLimiter) blocked(key string, limit int, period time.Duration) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	cutoff := time.Now().Add(-period)
+	recent := r.entries[key][:0]
+	for _, requestTime := range r.entries[key] {
+		if requestTime.After(cutoff) {
+			recent = append(recent, requestTime)
+		}
+	}
+	r.entries[key] = recent
+	return len(recent) >= limit
+}
+
 type server struct {
-	db      *sql.DB
-	limiter rateLimiter
+	db                *sql.DB
+	limiter           rateLimiter
+	adminName         string
+	adminPasswordHash []byte
 }
 
 // NewHandler provides the same-origin leaderboard routes and health check.
 func NewHandler(db *sql.DB) http.Handler {
-	s := &server{db: db, limiter: rateLimiter{entries: make(map[string][]time.Time)}}
+	s := &server{
+		db:                db,
+		limiter:           rateLimiter{entries: make(map[string][]time.Time)},
+		adminName:         strings.TrimSpace(os.Getenv("SUPER_ADMIN_USERNAME")),
+		adminPasswordHash: []byte(os.Getenv("SUPER_ADMIN_PASSWORD_HASH")),
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET "+apiPrefix+"/scores", s.listScores)
 	mux.HandleFunc("POST "+apiPrefix+"/sessions", s.createSession)
@@ -139,7 +166,11 @@ func (s *server) health(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (s *server) listScores(w http.ResponseWriter, _ *http.Request) {
-	rows, err := s.db.Query(`SELECT player, score, created_at FROM scores ORDER BY score DESC, created_at ASC LIMIT 10`)
+	rows, err := s.db.Query(`
+		SELECT player, score, created_at FROM scores
+		WHERE LOWER(TRIM(player)) <> LOWER(?)
+		ORDER BY score DESC, created_at ASC, id ASC LIMIT 10
+	`, s.adminName)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not load scores.")
 		return
@@ -178,6 +209,22 @@ func (s *server) createSession(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
+	}
+	if s.isAdmin(player) {
+		if len(s.adminPasswordHash) == 0 {
+			writeError(w, http.StatusServiceUnavailable, "Protected login is unavailable.")
+			return
+		}
+		key := "admin-login:" + clientIP(r)
+		if s.limiter.blocked(key, adminLoginFailures, adminLoginPeriod) {
+			writeError(w, http.StatusTooManyRequests, "Too many login attempts. Try again later.")
+			return
+		}
+		if len(request.Password) == 0 || len(request.Password) > 72 || bcrypt.CompareHashAndPassword(s.adminPasswordHash, []byte(request.Password)) != nil {
+			s.limiter.allow(key, adminLoginFailures, adminLoginPeriod)
+			writeError(w, http.StatusForbidden, "Incorrect password.")
+			return
+		}
 	}
 	sessionID, err := newSessionID()
 	if err != nil {
@@ -232,23 +279,24 @@ func (s *server) createScore(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "Could not submit that score.")
 		return
 	}
+	if _, err := tx.ExecContext(r.Context(), `UPDATE sessions SET consumed_at = ? WHERE id = ?`, now, request.SessionID); err != nil {
+		writeError(w, http.StatusInternalServerError, "Could not submit that score.")
+		return
+	}
 	scoreID, err := result.LastInsertId()
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not submit that score.")
 		return
 	}
-	if _, err := tx.ExecContext(r.Context(), `UPDATE sessions SET consumed_at = ? WHERE id = ?`, now, request.SessionID); err != nil {
-		writeError(w, http.StatusInternalServerError, "Could not submit that score.")
-		return
-	}
 	var higherScores int
-	if err := tx.QueryRowContext(r.Context(), `SELECT COUNT(*) FROM scores WHERE score > ?`, request.Score).Scan(&higherScores); err != nil {
+	includeAdmin := s.isAdmin(player)
+	if err := tx.QueryRowContext(r.Context(), `SELECT COUNT(*) FROM scores WHERE (? OR LOWER(TRIM(player)) <> LOWER(?)) AND score > ?`, includeAdmin, s.adminName, request.Score).Scan(&higherScores); err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not calculate that rank.")
 		return
 	}
 	rank := higherScores + 1
 	var matchingScores int
-	if err := tx.QueryRowContext(r.Context(), `SELECT COUNT(*) FROM scores WHERE score = ?`, request.Score).Scan(&matchingScores); err != nil {
+	if err := tx.QueryRowContext(r.Context(), `SELECT COUNT(*) FROM scores WHERE (? OR LOWER(TRIM(player)) <> LOWER(?)) AND score = ?`, includeAdmin, s.adminName, request.Score).Scan(&matchingScores); err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not calculate that rank.")
 		return
 	}
@@ -256,29 +304,29 @@ func (s *server) createScore(w http.ResponseWriter, r *http.Request) {
 	var position int
 	if err := tx.QueryRowContext(r.Context(), `
 		SELECT COUNT(*) FROM scores
-		WHERE score > ?
+		WHERE (? OR LOWER(TRIM(player)) <> LOWER(?)) AND (score > ?
 			OR (score = ? AND created_at < ?)
-			OR (score = ? AND created_at = ? AND id < ?)
-	`, request.Score, request.Score, now, request.Score, now, scoreID).Scan(&position); err != nil {
+			OR (score = ? AND created_at = ? AND id < ?))
+	`, includeAdmin, s.adminName, request.Score, request.Score, now, request.Score, now, scoreID).Scan(&position); err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not calculate that rank.")
 		return
 	}
-	above, err := scoreAtPosition(r.Context(), tx, position-1)
+	above, err := scoreAtPosition(r.Context(), tx, position-1, includeAdmin, s.adminName)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not calculate that rank.")
 		return
 	}
-	aboveNext, err := scoreAtPosition(r.Context(), tx, position-2)
+	aboveNext, err := scoreAtPosition(r.Context(), tx, position-2, includeAdmin, s.adminName)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not calculate that rank.")
 		return
 	}
-	below, err := scoreAtPosition(r.Context(), tx, position+1)
+	below, err := scoreAtPosition(r.Context(), tx, position+1, includeAdmin, s.adminName)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not calculate that rank.")
 		return
 	}
-	belowNext, err := scoreAtPosition(r.Context(), tx, position+2)
+	belowNext, err := scoreAtPosition(r.Context(), tx, position+2, includeAdmin, s.adminName)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not calculate that rank.")
 		return
@@ -299,23 +347,24 @@ func (s *server) createScore(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func scoreAtPosition(ctx context.Context, tx *sql.Tx, position int) (*rankedScore, error) {
+func scoreAtPosition(ctx context.Context, tx *sql.Tx, position int, includeAdmin bool, adminName string) (*rankedScore, error) {
 	if position < 0 {
 		return nil, nil
 	}
 	var item rankedScore
 	err := tx.QueryRowContext(ctx, `
 		SELECT player, score FROM scores
+		WHERE (? OR LOWER(TRIM(player)) <> LOWER(?))
 		ORDER BY score DESC, created_at ASC, id ASC
 		LIMIT 1 OFFSET ?
-	`, position).Scan(&item.Player, &item.Score)
+	`, includeAdmin, adminName, position).Scan(&item.Player, &item.Score)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM scores WHERE score > ?`, item.Score).Scan(&item.Rank); err != nil {
+	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM scores WHERE (? OR LOWER(TRIM(player)) <> LOWER(?)) AND score > ?`, includeAdmin, adminName, item.Score).Scan(&item.Rank); err != nil {
 		return nil, err
 	}
 	item.Rank += 1
@@ -343,6 +392,10 @@ func validPlayerName(value string) (string, error) {
 		return "", fmt.Errorf("Enter a name of up to %d characters.", maxNameRunes)
 	}
 	return name, nil
+}
+
+func (s *server) isAdmin(player string) bool {
+	return s.adminName != "" && strings.EqualFold(strings.TrimSpace(player), s.adminName)
 }
 
 func newSessionID() (string, error) {
