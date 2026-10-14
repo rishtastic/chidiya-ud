@@ -71,8 +71,31 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
             return
         }
 
-        password.hidden = import.meta.env.MODE === 'pages'
-        passwordLabel.hidden = password.hidden
+        let nameCheckTimer: ReturnType<typeof setTimeout> | undefined
+        let nameCheckVersion = 0
+        let checkedName = ''
+        let passwordRequired = false
+
+        const showPassword = (visible: boolean) => {
+            password.hidden = !visible
+            passwordLabel.hidden = !visible
+            if (!visible) password.value = ''
+        }
+
+        const checkName = async (name: string, version: number) => {
+            const required = await globalLeaderboard?.requiresPassword(name)
+            if (version !== nameCheckVersion || state !== 'ready' || input.value.trim().slice(0, nameLimit) !== name) {
+                return null
+            }
+            if (required !== null && required !== undefined) {
+                checkedName = name
+                passwordRequired = required
+                showPassword(required)
+            }
+            return required ?? null
+        }
+
+        showPassword(false)
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault()
@@ -93,17 +116,33 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
             let authenticatedSession: Promise<string | null> | undefined
             if (import.meta.env.MODE !== 'pages') {
                 startButton.disabled = true
+                if (nameCheckTimer) clearTimeout(nameCheckTimer)
+                const version = ++nameCheckVersion
+                const required = checkedName === name ? passwordRequired : await checkName(name, version)
+                if (required === null || required === undefined) {
+                    startButton.disabled = false
+                    error.textContent = 'Could not check this name. Try again.'
+                    return
+                }
+                if (required && !password.value) {
+                    startButton.disabled = false
+                    error.textContent = 'Enter the password for this name.'
+                    password.focus()
+                    return
+                }
                 input.disabled = true
                 password.disabled = true
-                const sessionID = await globalLeaderboard?.startSession(name, password.value || undefined)
+                const sessionID = await globalLeaderboard?.startSession(name, required ? password.value : undefined)
                 startButton.disabled = false
                 input.disabled = false
                 password.disabled = false
                 if (!sessionID) {
-                    error.textContent = 'Could not start the game. If this name is protected, check its password.'
+                    error.textContent = required
+                        ? 'Could not verify this name. Check the password or try again.'
+                        : 'Could not start the game. Try again.'
                     return
                 }
-                playerPassword = password.value
+                playerPassword = required ? password.value : ''
                 authenticatedSession = Promise.resolve(sessionID)
             }
             playerName = name
@@ -115,6 +154,15 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
 
         input.addEventListener('input', () => {
             error.textContent = ''
+            if (nameCheckTimer) clearTimeout(nameCheckTimer)
+            const version = ++nameCheckVersion
+            checkedName = ''
+            passwordRequired = false
+            showPassword(false)
+            const name = input.value.trim().slice(0, nameLimit)
+            if (name && import.meta.env.MODE !== 'pages') {
+                nameCheckTimer = setTimeout(() => { void checkName(name, version) }, 350)
+            }
         })
         password.addEventListener('input', () => {
             error.textContent = ''

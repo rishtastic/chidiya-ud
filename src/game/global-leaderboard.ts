@@ -29,6 +29,7 @@ export interface RankedLeaderboardScore {
 }
 
 export interface Leaderboard {
+    requiresPassword(player: string): Promise<boolean | null>
     startSession(player: string, password?: string): Promise<string | null>
     submitScore(sessionId: string, score: number, durationMs: number): Promise<ScoreSubmission | null>
     refresh(): Promise<void>
@@ -41,6 +42,21 @@ export default class GlobalLeaderboard {
 
     constructor(container: HTMLElement | null) {
         this.container = container
+    }
+
+    async requiresPassword(player: string): Promise<boolean | null> {
+        try {
+            const response = await fetch(`${apiBase}/name-protection`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ player }),
+            })
+            if (!response.ok) return null
+            const data = await response.json() as { requiresPassword: boolean }
+            return data.requiresPassword
+        } catch {
+            return null
+        }
     }
 
     async startSession(player: string, password?: string): Promise<string | null> {

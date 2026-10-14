@@ -9,6 +9,7 @@ The website build reads a shared top ten from the Go service in
 endpoints:
 
 - `GET /chidiya-ud/api/scores`
+- `POST /chidiya-ud/api/name-protection` (whether to show the password field)
 - `POST /chidiya-ud/api/sessions`
 - `POST /chidiya-ud/api/scores`
 - `GET /healthz`

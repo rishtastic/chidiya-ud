@@ -43,6 +43,10 @@ type sessionRequest struct {
 	Password string `json:"password"`
 }
 
+type nameProtectionRequest struct {
+	Player string `json:"player"`
+}
+
 type scoreRequest struct {
 	SessionID  string `json:"sessionId"`
 	Score      int    `json:"score"`
@@ -120,6 +124,7 @@ func NewHandler(db *sql.DB) http.Handler {
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET "+apiPrefix+"/scores", s.listScores)
+	mux.HandleFunc("POST "+apiPrefix+"/name-protection", s.nameProtection)
 	mux.HandleFunc("POST "+apiPrefix+"/sessions", s.createSession)
 	mux.HandleFunc("POST "+apiPrefix+"/scores", s.createScore)
 	mux.HandleFunc("GET /healthz", s.health)
@@ -193,6 +198,24 @@ func (s *server) listScores(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string][]score{"scores": scores})
+}
+
+func (s *server) nameProtection(w http.ResponseWriter, r *http.Request) {
+	if !s.limiter.allow("name-protection:"+clientIP(r), gameRequestLimit, gameRequestPeriod) {
+		writeError(w, http.StatusTooManyRequests, "Please wait before checking another name.")
+		return
+	}
+	var request nameProtectionRequest
+	if err := decodeJSON(r, &request); err != nil {
+		writeError(w, http.StatusBadRequest, "Enter a valid player name.")
+		return
+	}
+	player, err := validPlayerName(request.Player)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]bool{"requiresPassword": s.isAdmin(player)})
 }
 
 func (s *server) createSession(w http.ResponseWriter, r *http.Request) {

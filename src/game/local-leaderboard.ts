@@ -10,6 +10,10 @@ export default class LocalLeaderboard implements Leaderboard {
         this.container = container
     }
 
+    async requiresPassword(): Promise<boolean> {
+        return false
+    }
+
     async startSession(player: string): Promise<string | null> {
         return player
     }
