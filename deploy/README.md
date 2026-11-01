@@ -20,6 +20,11 @@ operation; the user-admin reset flow cannot change that credential.
 
 The dashboard is marked noindex and omitted from the sitemap. Every admin API
 checks authorization; hiding links is not the access-control mechanism.
+The domain-root robots file is managed by the website repository. The admin
+login stays crawlable so crawlers can read its noindex meta tag and HTTP
+header; do not add a Disallow for that page. Private account/admin API paths
+are excluded from crawling. The HTTP noindex rules live in the domain's Nginx
+configuration and must remain in place across deployments.
 
 ## Publish after approval
 

@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
-Disallow: /chidiya-ud/admin/
+Disallow: /chidiya-ud/api/admin/
+Disallow: /chidiya-ud/api/auth/
 
+# Keep the admin login crawlable so crawlers can read its noindex metadata/header.
 Sitemap: https://rishabhdaga.com/chidiya-ud/sitemap.xml
