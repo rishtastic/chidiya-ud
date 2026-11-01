@@ -33,11 +33,13 @@ revision=$(as_deploy git -C "$repo" rev-parse origin/master)
 as_deploy git -C "$repo" checkout --detach origin/master
 cd "$repo"
 
-if ! command -v yarn >/dev/null; then
+yarn_bin=$(command -v yarn || true)
+if [[ -z $yarn_bin ]]; then
     npm install --global yarn@1.22.22
+    yarn_bin="$(npm prefix --global)/bin/yarn"
 fi
-[[ $(yarn --version) == 1.22.22 ]] || { echo 'Yarn 1.22.22 is required.' >&2; exit 1; }
-as_deploy yarn install --frozen-lockfile --non-interactive
+[[ $("$yarn_bin" --version) == 1.22.22 ]] || { echo 'Yarn 1.22.22 is required.' >&2; exit 1; }
+as_deploy "$yarn_bin" install --frozen-lockfile --non-interactive
 as_deploy npm run build -- --base=/chidiya-ud/
 as_deploy env GOTOOLCHAIN=go1.27.3 go test ./...
 as_deploy env GOTOOLCHAIN=go1.27.3 go build -trimpath -o /srv/chidiya-ud/leaderboard.candidate ./cmd/leaderboard
