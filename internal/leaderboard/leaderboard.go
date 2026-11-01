@@ -30,6 +30,7 @@ const (
 	gameRequestPeriod  = 10 * time.Minute
 	adminLoginFailures = 5
 	adminLoginPeriod   = 15 * time.Minute
+	jsonBodyLimit      = 8 << 10
 )
 
 type score struct {
@@ -125,8 +126,10 @@ func NewHandler(db *sql.DB) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET "+apiPrefix+"/scores", s.listScores)
 	mux.HandleFunc("POST "+apiPrefix+"/name-protection", s.nameProtection)
+	mux.HandleFunc("GET "+apiPrefix+"/scores/all", s.listAllScores)
 	mux.HandleFunc("POST "+apiPrefix+"/sessions", s.createSession)
 	mux.HandleFunc("POST "+apiPrefix+"/scores", s.createScore)
+	s.registerSiteRoutes(mux)
 	mux.HandleFunc("GET /healthz", s.health)
 	return securityHeaders(mux)
 }
@@ -151,7 +154,10 @@ func Migrate(db *sql.DB) error {
 		);
 		CREATE INDEX IF NOT EXISTS scores_ranking ON scores(score DESC, created_at ASC);
 	`)
-	return err
+	if err != nil {
+		return err
+	}
+	return migrateSite(db)
 }
 
 func securityHeaders(next http.Handler) http.Handler {
@@ -215,7 +221,24 @@ func (s *server) nameProtection(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	writeJSON(w, http.StatusOK, map[string]bool{"requiresPassword": s.isAdmin(player)})
+	p, err := s.currentPrincipal(r)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "Could not check this name.")
+		return
+	}
+	required := s.isAdmin(player)
+	if !required {
+		var count int
+		if err := s.db.QueryRowContext(r.Context(), `SELECT COUNT(*) FROM accounts WHERE username_key = ?`, usernameKey(player)).Scan(&count); err != nil {
+			writeError(w, http.StatusInternalServerError, "Could not check this name.")
+			return
+		}
+		required = count != 0
+	}
+	if p != nil && usernameKey(p.Username) == usernameKey(player) {
+		required = false
+	}
+	writeJSON(w, http.StatusOK, map[string]bool{"requiresPassword": required})
 }
 
 func (s *server) createSession(w http.ResponseWriter, r *http.Request) {
@@ -233,7 +256,14 @@ func (s *server) createSession(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	if s.isAdmin(player) {
+	principal, err := s.currentPrincipal(r)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "Could not start the game.")
+		return
+	}
+	var accountID any
+	var guestHash any
+	if s.isAdmin(player) && (principal == nil || !principal.SuperAdmin) {
 		if len(s.adminPasswordHash) == 0 {
 			writeError(w, http.StatusServiceUnavailable, "Protected login is unavailable.")
 			return
@@ -249,13 +279,34 @@ func (s *server) createSession(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	if !s.isAdmin(player) {
+		var claimedID int64
+		err := s.db.QueryRowContext(r.Context(), `SELECT id FROM accounts WHERE username_key = ?`, usernameKey(player)).Scan(&claimedID)
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			writeError(w, http.StatusInternalServerError, "Could not start the game.")
+			return
+		}
+		if err == nil {
+			if principal == nil || principal.ID != claimedID {
+				writeError(w, http.StatusForbidden, "This name is claimed. Sign in to play.")
+				return
+			}
+			accountID = claimedID
+		} else {
+			guestHash, err = s.ensureGuest(w, r, player)
+			if err != nil {
+				writeError(w, http.StatusInternalServerError, "Could not start the game.")
+				return
+			}
+		}
+	}
 	sessionID, err := newSessionID()
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not start the game.")
 		return
 	}
 	now := time.Now()
-	_, err = s.db.Exec(`INSERT INTO sessions (id, player, created_at, expires_at) VALUES (?, ?, ?, ?)`, sessionID, player, now.UnixMilli(), now.Add(sessionLifetime).UnixMilli())
+	_, err = s.db.ExecContext(r.Context(), `INSERT INTO sessions (id, player, created_at, expires_at, account_id, guest_session_hash) VALUES (?, ?, ?, ?, ?, ?)`, sessionID, player, now.UnixMilli(), now.Add(sessionLifetime).UnixMilli(), accountID, guestHash)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not start the game.")
 		return
@@ -287,7 +338,9 @@ func (s *server) createScore(w http.ResponseWriter, r *http.Request) {
 	var player string
 	var expiresAt int64
 	var consumedAt sql.NullInt64
-	err = tx.QueryRowContext(r.Context(), `SELECT player, expires_at, consumed_at FROM sessions WHERE id = ?`, request.SessionID).Scan(&player, &expiresAt, &consumedAt)
+	var accountID sql.NullInt64
+	var guestHash sql.NullString
+	err = tx.QueryRowContext(r.Context(), `SELECT player, expires_at, consumed_at, account_id, guest_session_hash FROM sessions WHERE id = ?`, request.SessionID).Scan(&player, &expiresAt, &consumedAt, &accountID, &guestHash)
 	if errors.Is(err, sql.ErrNoRows) || consumedAt.Valid || expiresAt < time.Now().UnixMilli() {
 		writeError(w, http.StatusBadRequest, "That game session has expired.")
 		return
@@ -297,7 +350,7 @@ func (s *server) createScore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	now := time.Now().UnixMilli()
-	result, err := tx.ExecContext(r.Context(), `INSERT INTO scores (player, score, created_at) VALUES (?, ?, ?)`, player, request.Score, now)
+	result, err := tx.ExecContext(r.Context(), `INSERT INTO scores (player, score, created_at, account_id, guest_session_hash) VALUES (?, ?, ?, ?, ?)`, player, request.Score, now, accountID, guestHash)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Could not submit that score.")
 		return
@@ -398,7 +451,7 @@ func decodeJSON(r *http.Request, destination any) error {
 	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
 		return errors.New("expected JSON")
 	}
-	decoder := json.NewDecoder(io.LimitReader(r.Body, 2048))
+	decoder := json.NewDecoder(io.LimitReader(r.Body, jsonBodyLimit))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(destination); err != nil {
 		return err

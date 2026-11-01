@@ -2,6 +2,7 @@ export interface Candidate {
     name: string
     spoken: string
     canFly: boolean
+    explanation?: string
 }
 
 export interface HighScore {

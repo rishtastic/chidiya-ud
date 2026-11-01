@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ $EUID -eq 0 ]] || { echo 'Run on the VPS with sudo -n.' >&2; exit 1; }
+repo=/srv/chidiya-ud/repo
+web=/var/www/chidiya-ud
+service=chidiya-ud-leaderboard.service
+binary=/usr/local/bin/chidiya-ud-leaderboard
+environment=/srv/chidiya-ud/admin-auth.env
+expected_commit=${1:-}
+as_deploy() { sudo -n -u codex-deploy "$@"; }
+
+exec 9>/run/lock/deploy-chidiya-ud.lock
+flock -n 9 || { echo 'Another deployment is running.' >&2; exit 1; }
+[[ -d $repo/.git && -f $environment ]] || { echo 'Checkout or admin environment is missing.' >&2; exit 1; }
+[[ $(stat -c %a "$environment") == 600 ]] || { echo 'Admin environment must have mode 0600.' >&2; exit 1; }
+python3 - "$environment" <<'PY'
+import sys
+values = {}
+with open(sys.argv[1]) as source:
+    for line in source:
+        key, separator, value = line.strip().partition('=')
+        if separator:
+            values[key] = value.strip().strip('"').strip("'")
+if not all(values.get(key) for key in ('SUPER_ADMIN_USERNAME', 'SUPER_ADMIN_PASSWORD_HASH')):
+    raise SystemExit('Both super-admin environment settings must be configured.')
+PY
+
+[[ -z $(as_deploy git -C "$repo" status --porcelain) ]] || { echo 'VPS checkout has local changes.' >&2; exit 1; }
+as_deploy git -C "$repo" fetch --depth 1 origin master
+revision=$(as_deploy git -C "$repo" rev-parse origin/master)
+[[ -z $expected_commit || $revision == "$expected_commit" ]] || { echo 'Remote master does not match the approved commit.' >&2; exit 1; }
+as_deploy git -C "$repo" checkout --detach origin/master
+cd "$repo"
+
+if ! command -v yarn >/dev/null; then
+    npm install --global yarn@1.22.22
+fi
+[[ $(yarn --version) == 1.22.22 ]] || { echo 'Yarn 1.22.22 is required.' >&2; exit 1; }
+as_deploy yarn install --frozen-lockfile --non-interactive
+as_deploy npm run build -- --base=/chidiya-ud/
+as_deploy env GOTOOLCHAIN=go1.27.3 go test ./...
+as_deploy env GOTOOLCHAIN=go1.27.3 go build -trimpath -o /srv/chidiya-ud/leaderboard.candidate ./cmd/leaderboard
+
+release=$(date -u +%Y%m%dT%H%M%SZ)-${revision:0:12}
+backup=/srv/chidiya-ud/backups/$release
+rollback_web=/var/www/.chidiya-ud.rollback.$release
+stage=$(mktemp -d /var/www/.chidiya-ud.stage.XXXXXX)
+stopped=0
+cleanup() {
+    result=$?
+    trap - EXIT
+    set +e
+    if (( result != 0 && stopped )); then
+        echo "Deployment failed; restoring previous application. Database backup: $backup/database.db" >&2
+        systemctl stop "$service" || true
+        if [[ -d $rollback_web ]]; then
+            [[ ! -e $web ]] || mv "$web" "/var/www/.chidiya-ud.failed.$release"
+            mv "$rollback_web" "$web"
+        fi
+        install -o root -g root -m 0755 "$backup/leaderboard" "$binary.next"
+        mv "$binary.next" "$binary"
+        install -o root -g root -m 0644 "$backup/service" "/etc/systemd/system/$service"
+        systemctl daemon-reload
+        systemctl start "$service" || true
+    fi
+    rm -rf "$stage"
+    exit "$result"
+}
+trap cleanup EXIT
+cp -a dist/. "$stage/"
+chmod 0755 "$stage"
+[[ -d $web && -f $binary ]] || { echo 'Existing application is missing; refusing an upgrade.' >&2; exit 1; }
+systemctl is-active --quiet "$service"
+install -d -o root -g root -m 0700 "$backup"
+cp -a "$binary" "$backup/leaderboard"
+cp -a "/etc/systemd/system/$service" "$backup/service"
+printf '%s\n' "$revision" > "$backup/revision"
+
+systemctl stop "$service"
+stopped=1
+# SQLite's backup API includes committed WAL contents in a consistent snapshot.
+python3 - /srv/chidiya-ud/data/chidiya-ud.db "$backup/database.db" <<'PY'
+import os
+import sqlite3
+import sys
+source = sqlite3.connect('file:' + sys.argv[1] + '?mode=ro', uri=True)
+with sqlite3.connect(sys.argv[2]) as target:
+    source.backup(target)
+    if target.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
+        raise SystemExit('Database backup integrity check failed.')
+source.close()
+os.chmod(sys.argv[2], 0o600)
+PY
+install -o root -g root -m 0755 /srv/chidiya-ud/leaderboard.candidate "$binary.next"
+mv "$binary.next" "$binary"
+install -o root -g root -m 0644 deploy/chidiya-ud-leaderboard.service "/etc/systemd/system/$service"
+mv "$web" "$rollback_web"
+mv "$stage" "$web"
+systemctl daemon-reload
+systemctl start "$service"
+for attempt in {1..10}; do
+    if curl --noproxy '*' --fail --silent http://127.0.0.1:8082/healthz >/dev/null; then break; fi
+    sleep 1
+done
+curl --noproxy '*' --fail --silent --show-error http://127.0.0.1:8082/healthz
+curl --noproxy '*' --fail --silent --show-error https://rishabhdaga.com/chidiya-ud/ >/dev/null
+curl --noproxy '*' --fail --silent --show-error https://rishabhdaga.com/chidiya-ud/admin/ | grep -q 'noindex'
+asset=$(find "$web/assets" -maxdepth 1 -name '*.js' -print -quit)
+[[ -n $asset ]]
+curl --noproxy '*' --fail --silent --show-error "https://rishabhdaga.com/chidiya-ud/assets/$(basename "$asset")" >/dev/null
+systemctl is-active --quiet "$service"
+stopped=0
+echo "Deployed $revision. Rollback binary/unit/database: $backup; web: $rollback_web"

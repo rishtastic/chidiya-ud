@@ -2,12 +2,14 @@ import { itemLists } from './items/lists'
 import type { Leaderboard, ScoreSubmission } from './global-leaderboard'
 import type { Candidate } from './types'
 import { bolo, selectRandom } from './utils'
+import { currentAccount, endGuestSession, loadPublishedItems, login } from '../site/api'
 
 const initialResponseTime = 2000
 const minimumResponseTime = 1000
 const responseTimeStep = 50
 const nameLimit = 24
 const minimumRankLoadingMs = 1800
+const websiteMode = import.meta.env.MODE !== 'pages'
 
 type ScreenState = 'ready' | 'playing' | 'result'
 type EndReason = 'released-too-early' | 'held-too-long'
@@ -30,6 +32,9 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
     let playerName = ''
     let playerPassword = ''
     let itemPool: Candidate[] = []
+    let selectedLanguages: Array<keyof typeof itemLists> = []
+    let guestRound = false
+    let guestPromptShown = false
     let currentObject: Candidate
     let score = 0
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -53,6 +58,16 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
         }
     }
 
+    const prepareItemPool = async () => {
+        const lists = websiteMode ? await loadPublishedItems() : itemLists
+        itemPool = selectedLanguages.flatMap((language) => lists[language])
+        if (itemPool.length === 0) throw new Error('No published items are available for those languages.')
+    }
+
+    const revealSavePrompt = () => {
+        content.querySelector<HTMLElement>('#save-name-prompt')?.removeAttribute('hidden')
+    }
+
     const renderReady = () => {
         state = 'ready'
         playerPassword = ''
@@ -70,6 +85,8 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
         if (!form || !input || !error || !password || !passwordLabel || !startButton) {
             return
         }
+
+        if (websiteMode && currentAccount()) input.value = currentAccount()!.username
 
         let nameCheckTimer: ReturnType<typeof setTimeout> | undefined
         let nameCheckVersion = 0
@@ -106,15 +123,14 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
                 input.focus()
                 return
             }
-            const languages = new FormData(form).getAll('language')
+            selectedLanguages = new FormData(form).getAll('language')
                 .filter((value): value is keyof typeof itemLists => typeof value === 'string' && Object.hasOwn(itemLists, value))
-            itemPool = languages.flatMap((language) => itemLists[language])
-            if (itemPool.length === 0) {
+            if (selectedLanguages.length === 0) {
                 error.textContent = 'Choose at least one item language.'
                 return
             }
             let authenticatedSession: Promise<string | null> | undefined
-            if (import.meta.env.MODE !== 'pages') {
+            if (websiteMode) {
                 startButton.disabled = true
                 if (nameCheckTimer) clearTimeout(nameCheckTimer)
                 const version = ++nameCheckVersion
@@ -132,20 +148,36 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
                 }
                 input.disabled = true
                 password.disabled = true
-                const sessionID = await globalLeaderboard?.startSession(name, required ? password.value : undefined)
+                try {
+                    await prepareItemPool()
+                    if (required) {
+                        await login(name, password.value)
+                        password.value = ''
+                        document.dispatchEvent(new Event('chidiya:session-change'))
+                    }
+                } catch (cause) {
+                    error.textContent = cause instanceof Error ? cause.message : 'Could not load items. Try again.'
+                    startButton.disabled = false
+                    input.disabled = false
+                    password.disabled = false
+                    return
+                }
+                const sessionID = await globalLeaderboard?.startSession(name)
                 startButton.disabled = false
                 input.disabled = false
                 password.disabled = false
                 if (!sessionID) {
-                    error.textContent = required
-                        ? 'Could not verify this name. Check the password or try again.'
-                        : 'Could not start the game. Try again.'
+                    error.textContent = globalLeaderboard?.getLastError?.() ?? 'Could not start the game.'
+                    if (required) password.focus()
                     return
                 }
-                playerPassword = required ? password.value : ''
+                playerPassword = ''
                 authenticatedSession = Promise.resolve(sessionID)
+            } else {
+                await prepareItemPool()
             }
             playerName = name
+            guestRound = websiteMode && !passwordRequired && currentAccount()?.username.toLowerCase() !== name.toLowerCase()
             score = 0
             currentObject = selectRandom(itemPool)
             startLeaderboardRound(authenticatedSession)
@@ -280,7 +312,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
                 }
                 renderGlobalRankUnavailable()
                 return undefined
-            })
+            }).catch(renderGlobalRankUnavailable)
     }
 
     const renderGlobalRank = (submission: ScoreSubmission) => {
@@ -324,6 +356,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
             if (submission.isUniqueLeader) {
                 celebrateNewLeader()
             }
+            revealSavePrompt()
         }
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             finish()
@@ -345,6 +378,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
             rank.classList.remove('is-loading')
             rank.textContent = 'Your rank could not be loaded.'
         }
+        revealSavePrompt()
     }
 
     const renderGlobalRankLoading = () => {
@@ -441,42 +475,73 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
             ? `Oops - ${escapeHtml(object.name)} cannot fly.`
             : `Too late - ${escapeHtml(object.name)} can fly.`
 
+        const explanation = websiteMode && object.explanation?.trim()
+            ? `<p class="result-explanation">${escapeHtml(object.explanation.trim())}</p>`
+            : ''
+        const savePrompt = guestRound && websiteMode
+            ? `<div id="save-name-prompt" class="save-name-prompt${guestPromptShown ? ' is-quiet' : ''}" hidden>${guestPromptShown ? '' : `<p>Keep ${escapeHtml(playerName)} for yourself</p>`}<button id="save-name" class="text-button" type="button">Save my name</button>${guestPromptShown ? '' : '<button id="save-name-later" class="text-button" type="button">Not now</button>'}</div>`
+            : ''
         content.innerHTML = `
-          <div class="result-content" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">
+          <div class="result-content" tabindex="-1">
             <p class="result-message">${message}</p>
+            ${explanation}
             <p class="result-score">You scored <strong>${score}</strong></p>
             <div id="global-rank" class="global-rank" role="status" aria-live="polite" aria-atomic="true">${score > 0 ? '' : 'Score a point to earn a rank.'}</div>
+            ${savePrompt}
             <div class="result-actions">
               <button id="play-again" class="start-button" type="button">Play again</button>
               <button id="change-player" class="text-button" type="button">Change player</button>
+              <p id="replay-error" class="field-error" role="alert"></p>
             </div>
           </div>
         `
 
         if (score > 0) {
             renderGlobalRankLoading()
+        } else {
+            revealSavePrompt()
         }
+
+        content.querySelector<HTMLButtonElement>('#save-name')?.addEventListener('click', () => {
+            guestPromptShown = true
+            document.dispatchEvent(new CustomEvent('chidiya:save-name', { detail: { name: playerName } }))
+        })
+        content.querySelector<HTMLButtonElement>('#save-name-later')?.addEventListener('click', () => {
+            guestPromptShown = true
+            content.querySelector<HTMLElement>('#save-name-prompt')?.setAttribute('hidden', '')
+        })
 
         content.querySelector<HTMLButtonElement>('#play-again')?.addEventListener('click', async (event) => {
             let authenticatedSession: Promise<string | null> | undefined
-            if (import.meta.env.MODE !== 'pages') {
+            if (websiteMode) {
                 const button = event.currentTarget as HTMLButtonElement
                 button.disabled = true
-                const sessionID = await globalLeaderboard?.startSession(playerName, playerPassword)
+                try {
+                    await prepareItemPool()
+                } catch (cause) {
+                    content.querySelector<HTMLElement>('#replay-error')!.textContent = cause instanceof Error ? cause.message : 'Could not load items.'
+                    button.disabled = false
+                    return
+                }
+                const sessionID = await globalLeaderboard?.startSession(playerName, playerPassword || undefined)
                 button.disabled = false
                 if (!sessionID) {
-                    const rank = content.querySelector<HTMLElement>('#global-rank')
-                    if (rank) rank.textContent = 'Could not start another game. Try again.'
+                    content.querySelector<HTMLElement>('#replay-error')!.textContent = globalLeaderboard?.getLastError?.() ?? 'Could not start another game.'
                     return
                 }
                 authenticatedSession = Promise.resolve(sessionID)
             }
             score = 0
+            guestRound = websiteMode && !playerPassword && playerName.toLowerCase() !== currentAccount()?.username.toLowerCase()
             currentObject = selectRandom(itemPool)
             startLeaderboardRound(authenticatedSession)
             renderPlaying('Place your finger on the table to begin')
         })
-        content.querySelector<HTMLButtonElement>('#change-player')?.addEventListener('click', renderReady)
+        content.querySelector<HTMLButtonElement>('#change-player')?.addEventListener('click', async () => {
+            if (websiteMode) await endGuestSession().catch(() => undefined)
+            guestPromptShown = false
+            renderReady()
+        })
         content.querySelector<HTMLElement>('.result-content')?.focus()
     }
 
@@ -600,7 +665,11 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
     }
 
     window.addEventListener('blur', cancelHold)
+    document.addEventListener('chidiya:account-change', () => {
+        if (state === 'ready') content.querySelector<HTMLInputElement>('#player')?.dispatchEvent(new Event('input'))
+    })
     document.addEventListener('keydown', (event) => {
+        if (document.querySelector('dialog[open]') || (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable="true"]'))) return
         if (state === 'playing' && (event.key === ' ' || event.key === 'Enter')) {
             event.preventDefault()
             startHold()
@@ -610,6 +679,7 @@ function Game(game: HTMLDivElement | null, globalLeaderboard?: Leaderboard) {
         }
     })
     document.addEventListener('keyup', (event) => {
+        if (document.querySelector('dialog[open]') || (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable="true"]'))) return
         if (state === 'playing' && (event.key === ' ' || event.key === 'Enter')) {
             event.preventDefault()
             releaseHold()

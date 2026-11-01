@@ -59,10 +59,10 @@ GitHub Pages installs the committed Yarn lockfile. The VPS deployment uses
 can retain old transitive packages in its existing node_modules directory.
 The different dependency trees explain the different warning counts.
 
-Before deploying these fixes, make the VPS install the verified Yarn tree with
-`yarn install --frozen-lockfile`. Use a clean dependency installation for this
-upgrade so stale transitive packages are not reused. This audit branch does
-not edit the VPS deployment script.
+The prepared replacement helper in `deploy/deploy-chidiya-ud` uses
+`yarn install --frozen-lockfile` so the VPS installs the verified Yarn tree,
+including replacing stale transitive versions. It installs pinned Yarn if
+absent. The replacement has not yet been installed or run on the VPS.
 
 ### Go module advisories outside application call paths
 
@@ -81,6 +81,12 @@ or OpenPGP. The prepared update uses x/crypto 0.56.0, x/term 0.45.0, and x/sys
 - govulncheck: zero vulnerable symbols and zero vulnerable imported packages.
   One module-only warning remains, GO-2026-5932, for the unused and unmaintained
   x/crypto/openpgp package. It has no patched version and is not imported here.
+- These checks were repeated after integrating the accounts/admin feature.
+  Go tests with race detection also cover roles, password resets, guest score
+  claims, private-score filtering, CSRF/origin checks, configured-admin access,
+  and publishing item visibility. The deployment helper passes Bash syntax
+  validation; live deployment/rollback will be verified during the approved
+  production rollout.
 
 These results cover known advisories in the databases at audit time; they
 are not proof that the code has no vulnerabilities. The prepared dependency

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="%BASE_URL%favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Browse all Chidiya Ud high scores and search for a player." />
+    <link rel="canonical" href="https://rishabhdaga.com/chidiya-ud/leaderboard/" />
+    <title>Full leaderboard | Chidiya Ud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Atma:wght@600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <main class="data-page">
+      <header class="data-header">
+        <div><a class="back-link" href="%BASE_URL%">← Back to game</a><h1>High scores</h1></div>
+      </header>
+      <form id="board-search" class="data-search" role="search">
+        <label for="search-name">Search players</label>
+        <div class="search-row"><input id="search-name" name="search" type="search" autocomplete="off" placeholder="Player name" /><button type="submit">Search</button></div>
+      </form>
+      <p id="board-status" class="data-status" role="status">Loading scores…</p>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Score</th></tr></thead>
+          <tbody id="board-rows"></tbody>
+        </table>
+      </div>
+      <nav class="pager" aria-label="Leaderboard pages">
+        <button id="board-previous" type="button">Previous</button>
+        <span id="board-page"></span>
+        <button id="board-next" type="button">Next</button>
+      </nav>
+    </main>
+    <script type="module" src="/src/site/board.ts"></script>
+  </body>
+</html>

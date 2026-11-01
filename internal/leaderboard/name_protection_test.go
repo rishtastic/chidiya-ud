@@ -19,6 +19,9 @@ func TestNameProtection(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
+	if err := leaderboard.Migrate(db); err != nil {
+		t.Fatal(err)
+	}
 	handler := leaderboard.NewHandler(db)
 
 	for _, test := range []struct {

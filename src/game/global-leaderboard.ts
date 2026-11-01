@@ -33,12 +33,14 @@ export interface Leaderboard {
     startSession(player: string, password?: string): Promise<string | null>
     submitScore(sessionId: string, score: number, durationMs: number): Promise<ScoreSubmission | null>
     refresh(): Promise<void>
+    getLastError?(): string
 }
 
 const apiBase = `${import.meta.env.BASE_URL}api`
 
 export default class GlobalLeaderboard {
     private readonly container: HTMLElement | null
+    private lastError = ''
 
     constructor(container: HTMLElement | null) {
         this.container = container
@@ -60,6 +62,7 @@ export default class GlobalLeaderboard {
     }
 
     async startSession(player: string, password?: string): Promise<string | null> {
+        this.lastError = ''
         try {
             const response = await fetch(`${apiBase}/sessions`, {
                 method: 'POST',
@@ -67,13 +70,20 @@ export default class GlobalLeaderboard {
                 body: JSON.stringify(password ? { player, password } : { player }),
             })
             if (!response.ok) {
+                const data = await response.json() as { error?: string }
+                this.lastError = data.error ?? 'Could not start the game.'
                 return null
             }
             const data = await response.json() as SessionResponse
             return data.sessionId
         } catch {
+            this.lastError = 'The game server is unavailable. Please try again.'
             return null
         }
+    }
+
+    getLastError(): string {
+        return this.lastError
     }
 
     async submitScore(sessionId: string, score: number, durationMs: number): Promise<ScoreSubmission | null> {

@@ -1,0 +1,1202 @@
+[
+  {
+    "language": "english",
+    "name": "flamingo",
+    "spoken": "फ्लेमिंगो",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "penguin",
+    "spoken": "पेंगुइन",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "ostrich",
+    "spoken": "ऑस्ट्रिच",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "emu",
+    "spoken": "ईमू",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "kiwi",
+    "spoken": "कीवी",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "dragonfly",
+    "spoken": "ड्रैगनफ्लाई",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "ladybug",
+    "spoken": "लेडीबग",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "cockroach",
+    "spoken": "कॉकरोच",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "cheetah",
+    "spoken": "चीता",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "gorilla",
+    "spoken": "गोरिल्ला",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "zebra",
+    "spoken": "ज़ेब्रा",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "shark",
+    "spoken": "शार्क",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "whale",
+    "spoken": "व्हेल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "octopus",
+    "spoken": "ऑक्टोपस",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "crab",
+    "spoken": "क्रैब",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "helicopter",
+    "spoken": "हेलिकॉप्टर",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "rocket",
+    "spoken": "रॉकेट",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "drone",
+    "spoken": "ड्रोन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "hot air balloon",
+    "spoken": "हॉट एयर बैलून",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "kite",
+    "spoken": "काइट",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "paper plane",
+    "spoken": "पेपर प्लेन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "ufo",
+    "spoken": "यूएफ़ओ",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "paraglider",
+    "spoken": "पैराग्लाइडर",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "glider",
+    "spoken": "ग्लाइडर",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "car",
+    "spoken": "कार",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "bus",
+    "spoken": "बस",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "cycle",
+    "spoken": "साइकिल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "bike",
+    "spoken": "बाइक",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "train",
+    "spoken": "ट्रेन",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "boat",
+    "spoken": "बोट",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "ship",
+    "spoken": "शिप",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "tractor",
+    "spoken": "ट्रैक्टर",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "truck",
+    "spoken": "ट्रक",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "auto",
+    "spoken": "ऑटो",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "mobile",
+    "spoken": "मोबाइल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "laptop",
+    "spoken": "लैपटॉप",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "ball",
+    "spoken": "बॉल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "superman",
+    "spoken": "सुपरमैन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "iron man",
+    "spoken": "आयरन मैन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "thor",
+    "spoken": "थॉर",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "spider-man",
+    "spoken": "स्पाइडर-मैन",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "batman",
+    "spoken": "बैटमैन",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "harry potter",
+    "spoken": "हैरी पॉटर",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "genie",
+    "spoken": "जीनी",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "dragon",
+    "spoken": "ड्रैगन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "unicorn",
+    "spoken": "यूनिकॉर्न",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "eagle",
+    "spoken": "ईगल",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "sparrow",
+    "spoken": "स्पैरो",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "crow",
+    "spoken": "क्रो",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "seagull",
+    "spoken": "सीगल",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "woodpecker",
+    "spoken": "वुडपेकर",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "kingfisher",
+    "spoken": "किंगफिशर",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "parakeet",
+    "spoken": "पैराकीट",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "vulture",
+    "spoken": "वल्चर",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "crane",
+    "spoken": "क्रेन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "stork",
+    "spoken": "स्टॉर्क",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "pelican",
+    "spoken": "पेलिकन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "heron",
+    "spoken": "हेरॉन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "robin",
+    "spoken": "रॉबिन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "canary",
+    "spoken": "कनैरी",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "falcon",
+    "spoken": "फाल्कन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "hawk",
+    "spoken": "हॉक",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "swift",
+    "spoken": "स्विफ्ट",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "swallow",
+    "spoken": "स्वॉलो",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "hummingbird",
+    "spoken": "हमिंगबर्ड",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "macaw",
+    "spoken": "मकॉ",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "ant",
+    "spoken": "ऐंट",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "spider",
+    "spoken": "स्पाइडर",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "scorpion",
+    "spoken": "स्कॉर्पियन",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "snail",
+    "spoken": "स्नेल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "earthworm",
+    "spoken": "अर्थवर्म",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "centipede",
+    "spoken": "सेंटीपीड",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "millipede",
+    "spoken": "मिलीपीड",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "beetle",
+    "spoken": "बीटल",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "wasp",
+    "spoken": "वॉस्प",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "firefly",
+    "spoken": "फायरफ्लाई",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "rhino",
+    "spoken": "राइनो",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "hippo",
+    "spoken": "हिप्पो",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "wolf",
+    "spoken": "वुल्फ",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "fox",
+    "spoken": "फॉक्स",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "jackal",
+    "spoken": "जैकल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "hyena",
+    "spoken": "हाइना",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "bear",
+    "spoken": "बेयर",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "panda",
+    "spoken": "पांडा",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "koala",
+    "spoken": "कोआला",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "kangaroo",
+    "spoken": "कंगारू",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "lemur",
+    "spoken": "लीमर",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "otter",
+    "spoken": "ऑटर",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "beaver",
+    "spoken": "बीवर",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "porcupine",
+    "spoken": "पॉर्क्यूपाइन",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "hedgehog",
+    "spoken": "हेजहॉग",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "camel",
+    "spoken": "कैमल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "donkey",
+    "spoken": "डॉन्की",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "yak",
+    "spoken": "याक",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "buffalo",
+    "spoken": "बफैलो",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "deer",
+    "spoken": "डियर",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "dolphin",
+    "spoken": "डॉल्फिन",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "seal",
+    "spoken": "सील",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "walrus",
+    "spoken": "वॉलरस",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "starfish",
+    "spoken": "स्टारफिश",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "jellyfish",
+    "spoken": "जेलीफिश",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "lobster",
+    "spoken": "लॉब्स्टर",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "shrimp",
+    "spoken": "श्रिम्प",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "eel",
+    "spoken": "ईल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "stingray",
+    "spoken": "स्टिंगरे",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "seahorse",
+    "spoken": "सीहॉर्स",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "zeppelin",
+    "spoken": "ज़ेपलिन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "airship",
+    "spoken": "एयरशिप",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "fighter jet",
+    "spoken": "फाइटर जेट",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "space shuttle",
+    "spoken": "स्पेस शटल",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "satellite",
+    "spoken": "सैटेलाइट",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "submarine",
+    "spoken": "सबमरीन",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "canoe",
+    "spoken": "कैनो",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "kayak",
+    "spoken": "कयाक",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "scooter",
+    "spoken": "स्कूटर",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "skateboard",
+    "spoken": "स्केटबोर्ड",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "frisbee",
+    "spoken": "फ्रिस्बी",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "balloon",
+    "spoken": "बैलून",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "soap bubble",
+    "spoken": "सोप बबल",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "leaf",
+    "spoken": "लीफ",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "feather",
+    "spoken": "फेदर",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "newspaper",
+    "spoken": "न्यूज़पेपर",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "plastic bag",
+    "spoken": "प्लास्टिक बैग",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "parachute",
+    "spoken": "पैराशूट",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "confetti",
+    "spoken": "कन्फेटी",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "dust",
+    "spoken": "डस्ट",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "table",
+    "spoken": "टेबल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "sofa",
+    "spoken": "सोफ़ा",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "television",
+    "spoken": "टेलीविज़न",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "refrigerator",
+    "spoken": "रेफ्रिजरेटर",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "washing machine",
+    "spoken": "वॉशिंग मशीन",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "microwave",
+    "spoken": "माइक्रोवेव",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "book",
+    "spoken": "बुक",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "pencil",
+    "spoken": "पेंसिल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "bottle",
+    "spoken": "बॉटल",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "umbrella",
+    "spoken": "अम्ब्रेला",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "witch",
+    "spoken": "विच",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "ghost",
+    "spoken": "घोस्ट",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "angel",
+    "spoken": "एंजेल",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "phoenix",
+    "spoken": "फीनिक्स",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "pegasus",
+    "spoken": "पेगासस",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "fairy",
+    "spoken": "फेयरी",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "demon",
+    "spoken": "डीमन",
+    "canFly": true
+  },
+  {
+    "language": "english",
+    "name": "rocket raccoon",
+    "spoken": "रॉकेट रैकून",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "hulk",
+    "spoken": "हल्क",
+    "canFly": false
+  },
+  {
+    "language": "english",
+    "name": "captain america",
+    "spoken": "कैप्टन अमेरिका",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "chidiya",
+    "spoken": "चिड़िया",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "kauwa",
+    "spoken": "कौवा",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "kabootar",
+    "spoken": "कबूतर",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "tota",
+    "spoken": "तोता",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "mor",
+    "spoken": "मोर",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "murgi",
+    "spoken": "मुर्गी",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "batakh",
+    "spoken": "बत्तख",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "hans",
+    "spoken": "हंस",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "baaz",
+    "spoken": "बाज़",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "cheel",
+    "spoken": "चील",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "ullu",
+    "spoken": "उल्लू",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "maina",
+    "spoken": "मैना",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "bulbul",
+    "spoken": "बुलबुल",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "koel",
+    "spoken": "कोयल",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "murga",
+    "spoken": "मुर्गा",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "chamgadad",
+    "spoken": "चमगादड़",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "titli",
+    "spoken": "तितली",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "madhumakkhi",
+    "spoken": "मधुमक्खी",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "machhar",
+    "spoken": "मच्छर",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "makhi",
+    "spoken": "मक्खी",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "tiddi",
+    "spoken": "टिड्डी",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "patanga",
+    "spoken": "पतंगा",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "haathi",
+    "spoken": "हाथी",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "sher",
+    "spoken": "शेर",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "bagh",
+    "spoken": "बाघ",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "ghoda",
+    "spoken": "घोड़ा",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "gadha",
+    "spoken": "गधा",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "gaay",
+    "spoken": "गाय",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "bhains",
+    "spoken": "भैंस",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "bakri",
+    "spoken": "बकरी",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "bhed",
+    "spoken": "भेड़",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "kutta",
+    "spoken": "कुत्ता",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "billi",
+    "spoken": "बिल्ली",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "khargosh",
+    "spoken": "खरगोश",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "bandar",
+    "spoken": "बंदर",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "jiraaf",
+    "spoken": "जिराफ़",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "oont",
+    "spoken": "ऊँट",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "suar",
+    "spoken": "सूअर",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "hiran",
+    "spoken": "हिरण",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "magarmach",
+    "spoken": "मगरमच्छ",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "kachhua",
+    "spoken": "कछुआ",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "saap",
+    "spoken": "साँप",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "chipkali",
+    "spoken": "छिपकली",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "mendhak",
+    "spoken": "मेंढक",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "machhli",
+    "spoken": "मछली",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "hawai jahaj",
+    "spoken": "हवाई जहाज़",
+    "canFly": true
+  },
+  {
+    "language": "hindi",
+    "name": "pankha",
+    "spoken": "पंखा",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "kursi",
+    "spoken": "कुर्सी",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "mez",
+    "spoken": "मेज़",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "patthar",
+    "spoken": "पत्थर",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "seb",
+    "spoken": "सेब",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "kela",
+    "spoken": "केला",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "aam",
+    "spoken": "आम",
+    "canFly": false
+  },
+  {
+    "language": "hindi",
+    "name": "pari",
+    "spoken": "परी",
+    "canFly": true
+  }
+]
